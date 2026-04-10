@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
-    role INT,
+    role INT DEFAULT(1),
     password VARCHAR(250) NOT NULL,
     created_at TIMESTAMP DEFAULT(CURRENT_TIMESTAMP),
 
@@ -94,5 +94,17 @@ CREATE TABLE IF NOT EXISTS users_games (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (user_provider_id) REFERENCES users_provider(id) ON DELETE SET NULL
 );
+
+-- Como no admiten duplicados no se repetirá la inserción aunque lo ejecutemos por segunda vez
+INSERT INTO roles(name) VALUE("user");
+INSERT INTO roles(name) VALUE("admin");
+
+INSERT INTO themes(name) VALUE("light");
+INSERT INTO themes(name) VALUE("dark");
+
+INSERT INTO languages(name) VALUE("english");
+INSERT INTO languages(name) VALUE("spanish");
+
+
 
 
