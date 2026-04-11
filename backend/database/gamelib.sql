@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 -- It's a link Table, that's why only has Foreign Keys 
 CREATE TABLE IF NOT EXISTS users_data (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT PRIMARY KEY,
     theme INT,
     language INT,
     
