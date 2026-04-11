@@ -38,8 +38,7 @@ function salirSiNoHaySesion ($ruta) {
 /**
  * Función para ejecutar una consulta sql a partir de la consulta y los valores que usemos en la consulta
  */
-function ejecutarQuery(string $sql, array $valores = [])
-{
+function ejecutarQuery(string $sql, array $valores = []) {
     global $conexion; // Usa la variable global de conexión ya creada
 
     $stmt = mysqli_prepare($conexion, $sql); // Prepara la consulta SQL para evitar inyección
