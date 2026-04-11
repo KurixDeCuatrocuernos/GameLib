@@ -18,7 +18,9 @@ if ($_SERVER["REQUEST_METHOD"]=="POST") { // Si hay POST continuamos
     if (!empty($password)) {
 
         if (empty($username)) {
-            $message = "El username y el email estan vacíos"; // Deberíamos redirigir al formulario y dar feedback
+            http_response_code(400); // Bad Request
+            echo json_encode(["message" => "El username y el email estan vacíos"]); // Deberíamos redirigir al formulario y dar feedback
+            exit;
         } else {
             
             $sql = 'SELECT * FROM users WHERE ';
@@ -31,8 +33,10 @@ if ($_SERVER["REQUEST_METHOD"]=="POST") { // Si hay POST continuamos
 
             $result = ejecutarQuery($sql, [$username]); // ejecutamos la consulta
 
-            if (!count($result) > 0) {
-                $message = "No se encuentra un usuario con ese email o username"; // Redirigimos al formulario y damos feedback GENÉRICO
+            if (empty($result)) { 
+                http_response_code(401); // Unauthorized
+                echo json_encode(["message" => "No se encuentra un usuario con ese email o username y contraseña"]); // Redirigimos al formulario y damos feedback GENÉRICO
+                exit;
             } else {
                 if (password_verify($password,$result[0]["password"])) {
                     $user = $result[0];
@@ -40,31 +44,25 @@ if ($_SERVER["REQUEST_METHOD"]=="POST") { // Si hay POST continuamos
                     $_SESSION["user_id"] = $user["id"];
                     $_SESSION["username"] = $user["name"];
                     $_SESSION["role"] = $user["role"];
-
-                    header("Location: ../../pages/usersPage.php"); // Redirigiremos al inicio y mostraremos que la sesión está activa
+                    
+                    http_response_code(200); // OK
+                    echo json_encode(["message" => "Se ha iniciado sesión con éxito"]); // Redirigimos al formulario y damos feedback GENÉRICO                    
                     exit;
                 } else {
-                    $message = 'Las contraseñas no coinciden'; // Redirigimos al formulario y damos feedback GENÉRICO
+                    http_response_code(401); // Unauthorized
+                    echo json_encode(["message" => "No se encuentra un usuario con ese email o username y contraseña"]); // Redirigimos al formulario y damos feedback GENÉRICO
+                    exit;
                 }
             }
-
         }  
     } else {
-        $message = "La contraseña está vacía"; // Deberíamos redirigir al formulario y dar feedback
+        http_response_code(400); // Empty Data
+        echo json_encode(["message" => "La contraseña está vacía"]); // Deberíamos redirigir al formulario y dar feedback
+        exit;
     }
 } else {
-    $message = "No hay POST"; // Deberíamos redirigir de vuelta al index
+    http_response_code(405); // Method Not Allowed
+    echo json_encode(["message" => "No hay POST"]); // Deberíamos redirigir de vuelta al index
+    exit;
 }
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1><?= $message ?></h1>
-</body>
-</html>
