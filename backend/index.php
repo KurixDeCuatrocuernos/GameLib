@@ -9,6 +9,5 @@
 <body>
     <h1>Hola, estás en el Backend del TFG</h1>
     <br>
-    <h2><a href="./pages/usersPage.php">Utilities for users</a></h2>
 </body>
 </html>
