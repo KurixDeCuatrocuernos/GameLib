@@ -86,3 +86,8 @@ docker-compose.override.yml
 # =========================
 /public/uploads/*
 !/public/uploads/.gitkeep
+
+# =========================
+# Datos Sensibles
+# =========================
+igdbData.json
