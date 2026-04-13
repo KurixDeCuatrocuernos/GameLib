@@ -3,10 +3,15 @@
  * Esta Función sirve para modificar los datos de un usuario a partir de los datos de un formulario
  * 
  */
-require_once __DIR__.'/../../database/db.php';
-require_once __DIR__.'/../commonFunctions.php';
+    require_once __DIR__.'/../../database/db.php';
+    require_once __DIR__.'/../commonFunctions.php';
 
-if($_SERVER["REQUEST_METHOD"]==='POST') {
+    if($_SERVER["REQUEST_METHOD"]==='POST') {
+        http_response_code(405); // Not Allowed
+        echo json_encode(["message" => "No hay POST"]); // Deberíamos redirigir de vuelta al index
+        exit;
+    }
+
     $input = file_get_contents('php://input'); // Recogemos los datos en JSON
     $data = json_decode($input, true);// Decodificamos los datos
     
@@ -21,6 +26,7 @@ if($_SERVER["REQUEST_METHOD"]==='POST') {
         echo json_encode(["error" => "No has iniciado sesión"]); // Redirigir al login
         exit;
     }
+
     $sql = 'SELECT u.id, u.name, u.email, u.role, u.password, ud.theme, ud.language
             FROM users u JOIN users_data ud ON u.id = ud.id
             WHERE u.id = ?';
@@ -146,9 +152,5 @@ if($_SERVER["REQUEST_METHOD"]==='POST') {
         echo json_encode(["message" => "Hubo un problema interno al actualizar el tema de la aplicación o el lenguaje"]); // Deberíamos redirigir al formulario y dar feedback
         exit;
     }          
-} else {
-    http_response_code(405); // Not Allowed
-    echo json_encode(["message" => "No hay POST"]); // Deberíamos redirigir de vuelta al index
-    exit;
-}
+
 ?>

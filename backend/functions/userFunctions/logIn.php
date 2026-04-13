@@ -6,11 +6,15 @@
 require_once __DIR__.'/../../database/db.php';
 require_once __DIR__.'/../commonFunctions.php';
 
-// Salimos si ya hay sesión activa: REDIRIGIR AL FRONT
-salirSiHaySesion("../../pages/usersPage.php");
+    // Salimos si ya hay sesión activa: REDIRIGIR AL FRONT
+    salirSiHaySesion("../../pages/usersPage.php");
 
-if ($_SERVER["REQUEST_METHOD"] === 'POST') { // Si hay POST continuamos
-
+    if ($_SERVER["REQUEST_METHOD"] === 'POST') { // Si hay POST continuamos
+        http_response_code(405); // Method Not Allowed
+        echo json_encode(["message" => "No hay POST"]); // Deberíamos redirigir de vuelta al index
+        exit;
+    }
+    
     $input = file_get_contents('php://input'); // Recogemos los datos en JSON
     $data = json_decode($input, true); // Decodificamos los datos
     
@@ -55,9 +59,5 @@ if ($_SERVER["REQUEST_METHOD"] === 'POST') { // Si hay POST continuamos
     echo json_encode(["message" => "Se ha iniciado sesión con éxito"]); // Redirigimos al formulario y damos feedback GENÉRICO                    
     exit;
 
-} else {
-    http_response_code(405); // Method Not Allowed
-    echo json_encode(["message" => "No hay POST"]); // Deberíamos redirigir de vuelta al index
-    exit;
-}
+
 ?>
