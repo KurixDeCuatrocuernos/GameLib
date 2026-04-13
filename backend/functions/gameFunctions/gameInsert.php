@@ -7,7 +7,7 @@
     require_once __DIR__.'/../commonFunctions.php';
     require_once __DIR__.'/gameFunctions.php';
 
-    if ($_SERVER["REQUEST_METHOD"] !== 'POST') {
+    if ($_SERVER["REQUEST_METHOD"] === 'POST') {
         $input = file_get_contents('php://input'); // Recogemos los datos con fetch
         $data = json_decode($input, true); // decodificamos los datos de json
         

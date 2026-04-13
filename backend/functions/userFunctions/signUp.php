@@ -6,7 +6,7 @@
     require_once __DIR__.'/../../database/db.php';
     require_once __DIR__.'/../commonFunctions.php';
 
-    if ($_SERVER["REQUEST_METHOD"]=="POST") { // Si hay POST continuamos
+    if ($_SERVER["REQUEST_METHOD"]==="POST") { // Si hay POST continuamos
         
         $input = file_get_contents("php://input"); // Recogemos los datos en JSON
         $data = json_decode($input, true); // Decodificamos los datos
