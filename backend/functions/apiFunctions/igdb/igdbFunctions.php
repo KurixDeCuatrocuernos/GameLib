@@ -6,24 +6,222 @@
 define('IGDB_JSON', __DIR__.'/igdbData.json');
 
 /**
- * Esta función obtiene un juego de la API IGDB a partir de su titulo
+ * Esta función obtiene una lista de juegos de la API IGDB a partir de su titulo
  */
-function getIgdbGameByName($name) {
-    
+function searchIgdbGameByName($name) {
+    // Revisamos que exista el nombre
+    if (empty($name) || !is_string($name)){
+        error_log("No se ha recibido name, se recibió: $name");
+        return null;
+    }
+    $name = trim($name);
+    $name = str_replace(['"', "'"], '', $name); // Eliminamos posibles comillas para evitar errores en la consulta
+    // Preparamos la query
+    $query = "
+        fields id, name, cover, first_release_date;
+        search \"$name\";
+        limit 10;
+    ";
+    // Ejecutamos la query
+    $response = consultaIGDB($query);
+    // Revisamos los datos
+    if (empty($response)) {
+        throw new Exception("No se obtuvo respuesta de IGDB");
+    }
+    // Decodificamos el Json
+    $data = json_decode($response, true);
+    // Revisamos la decodificación
+    if (json_last_error() !== JSON_ERROR_NONE || !is_array($data)) {
+        throw new Exception("No se pudo decodficar los datos de JSON");
+    }
+    if (empty($data)) {
+        return []; // No hay resultados, pero todo ha salido bien
+    }
+    // Devolvemos los datos
+    return $data;
+}
+
+/**
+ * Esta función ejecuta una consulta CURL a la API de IGDB
+ * Devuelve los datos en JSON o null
+ */
+function consultaIGDB($query) {
+    if (empty($query)){
+        error_log("No se ha recibido query, se recibió: $query");
+        return null;
+    }
+
+    $clientId = getClientId(); // Recogemos el client Id
+    $authToken = getAccessToken(); // Recogemos el access Token
+    $url = 'https://api.igdb.com/v4/games'; // URL al endpoint de la API
+
+    $prepare = curl_init(); // Inicuamos la consulta cURL
+
+    // Preparamos la consulta con su header y la query, especificando URL, POST y si queremos que nos devuelva un resultado o no
+    curl_setopt_array($prepare, [
+        CURLOPT_URL => $url, 
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_HTTPHEADER => [
+            "Client-ID: $clientId",
+            "Authorization: Bearer $authToken",
+            "Content-Type: text/plain"
+        ],
+        CURLOPT_POSTFIELDS => $query
+    ]);
+    $response = curl_exec($prepare); // Ejecutamos la consulta cURL
+    // Revisamos la respuesta a la consulta (sólo errores)
+    if (curl_errno($prepare)) { 
+        error_log("Hubo un error con cURL: ".curl_error($prepare));
+        return null;
+    }
+
+    curl_close($prepare); // Cerramos la consulta
+
+    return $response; // Devolvemos el resultado
 }
 
 /**
  * Esta función obtiene un juego de la API IGDB a partir de su id
  */
 function getIgdbGameById($id) {
+    if (!$id || !is_numeric($id)){
+        error_log("No se ha recibido id válido, se recibió: $id");
+        return null;
+    }
 
+    $sql = 'SELECT * FROM games WHERE igdb_id = ?';
+    $game = ejecutarQuery($sql, [$id]);
+
+    if (!isset($game[0])) {
+
+        $query = "
+            fields name, cover, first_release_date;
+            where id = $id;
+        ";
+
+        $response = consultaIGDB($query);
+        if (empty($response)) {
+            throw new Exception("No se obtuvo respuesta de IGDB");
+        }        
+        $data = json_decode($response, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new Exception("No se pudo decodficar los datos de JSON");
+        }
+
+        $gameData = $data[0] ?? null;
+        if (!$gameData) {
+            throw new Exception("No se encontraron datos de ese juego");
+        }
+
+        // Si estamos aquí, hay datos 
+
+        $sql = 'INSERT INTO games(igdb_id, name, cover_data, release_date) VALUES (?, ?, ?, ?)';
+        // Revisamos y transformamos los datos recibidos
+        if (!is_string($gameData['name'])) {
+            throw new Exception("el título del juego no es un string");
+        }
+        $date = !empty($gameData['first_release_date'])
+            ? date("Y-m-d", $gameData['first_release_date'])
+            : date("Y-m-d");
+        $cover = !empty($gameData['cover'])
+            ? json_encode($gameData['cover'])
+            : json_encode([]);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new Exception("Error al codificar el cover de IGDB en JSON");
+        }
+        // Insertamos los datos
+        ejecutarQuery($sql, [$id, $gameData['name'], $cover, $date]);
+        
+
+        $sql = 'SELECT * FROM games WHERE igdb_id = ?'; // Se podría optimizar si recogiésemos mediante mysqli_insert_id(), pero prefiero realizar una consulta extra a refactorizar el wrapper (y todo el proyecto en realidad).
+        $game = ejecutarQuery($sql, [$id]);
+
+        return $game[0];
+    }
+    return $game[0];
 }
 
 /**
  * Esta función convierte la url de igdb en una URL consumible por el front
  */
-function getGameCoverByUrl($url) {
+function getGameCoverById($id) {
+    $noCover = "https://placehold.co/300x450?text=No+Cover";
+    // Revisamos que haya id
+    if (empty($id)){
+        error_log("No se ha recibido id, se recibió: $id");
+        return $noCover;
+    }
 
+    // Buscamos el juego en la base de datos
+    $sql = 'SELECT * FROM games WHERE id = ? LIMIT 1';
+    $game = ejecutarQuery($sql, [$id]);
+    $game = $game[0] ?? null; // Recogemos el juego del array que devuelve la función o nulo
+
+    // Si no existe el juego, lo intentamos obtener una sola vez
+    if (empty($game)) {
+        $game = getGameById($id);
+
+        if (empty($game)) {
+            error_log("No se pudo obtener el juego con id: $id");
+            return $noCover;
+        }
+    }
+
+    // Decodificar JSON SIEMPRE antes de usarlo
+    if (empty($game['cover_data'])) {
+        error_log("El juego no tiene cover_data");
+        return $noCover;
+    }
+
+    // Decodificamos el JSON
+    $arrayCover = json_decode($game['cover_data'], true);
+    // Revisamos errores de decodificación 
+    if (!is_array($arrayCover)) {
+        error_log("No se pudo decodificar el JSON");
+        return $noCover;
+    }
+    // Revisamos que haya URL
+    if (empty($arrayCover['url'])) {
+        error_log("El cover_data no contiene URL");
+        return $noCover;
+    }
+
+    // Construir URL final
+    $url = "https:" . $arrayCover['url'];
+    $finalUrl = str_replace("t_thumb", "t_cover_big", $url);
+
+    // Revisamos que la URL sea válida
+    if (!filter_var($finalUrl, FILTER_VALIDATE_URL)) {
+        error_log("La url final no es válida: $finalUrl");
+        return $noCover;
+    }
+    // Si todo ha ido bien devolvemos la URL
+    return $finalUrl;
+}
+
+/**
+ * Esta función devuelve el client_id de IGDB API
+ */
+function getClientId() {
+
+    if (!file_exists(IGDB_JSON)) {
+        throw new Exception("Archivo de configuración IGDB no existe");
+    }
+
+    $content = file_get_contents(IGDB_JSON);
+    $fileData = json_decode($content, true);
+
+    if (
+        json_last_error() !== JSON_ERROR_NONE ||
+        !is_array($fileData) ||
+        empty($fileData['client_id'])
+    ) {
+        throw new Exception("No se pudo obtener el client_id de IGDB");
+    }
+
+    return $fileData['client_id'];
 }
 
 /**
@@ -130,7 +328,7 @@ function resetAccessToken() {
             "method" => "POST",
             "content" => http_build_query($data)
         ]
-    ]; // 
+    ];
 
     $context = stream_context_create($options);
     $response = file_get_contents($url, false, $context); // Recogemos la respuesta de la API 

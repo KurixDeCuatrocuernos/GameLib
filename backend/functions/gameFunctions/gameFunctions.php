@@ -2,6 +2,7 @@
 
     require_once __DIR__.'/../../database/db.php';
     require_once __DIR__.'/../commonFunctions.php';
+    require_once __DIR__.'/../apiFunctions/igdb/igdbFunctions.php';
 
     function isDate($fecha) {
         $d = DateTime::createFromFormat('Y-m-d', $fecha);
@@ -49,5 +50,32 @@
             }
         }
         return $games; // Devolvemos un array de juegos recogidos
+    }
+    /**
+     * Esta función busca un juego en la base de datos a partir de su nombre
+     * En cualquier caso se devolverá un array con un origen (db o igdb) y un array de arrays
+     * Importante, igdb devuelve cover, db devuelve cover_data, entre otras
+     */
+    function searchGameByName($name) {
+        if (empty($name) || !is_string($name)) {
+            throw new Exception("El nombre proporcionado no es válido");
+        }
+        $name = trim(str_replace('"','', $name)); // Eliminamos posibles comillas y espacios para evitar errores en la consulta
+        $sql = 'SELECT * FROM games WHERE name LIKE ?';
+        $result = ejecutarQuery($sql, ["%$name%"]);
+        // Revisamos si hay datos
+        if (empty($result)) {
+            $result = searchIgdbGameByName($name); // Buscamos el título en IGDB
+            // Devolvemos los datos de IGDB
+            return [
+                'source' => 'igdb',
+                'data' => $result
+            ]; 
+        }
+        // Devolvemos los datos de la base de datos
+        return [
+            'source' => 'db',
+            'data' => $result
+        ];
     }
 ?>
