@@ -6,9 +6,9 @@
 define('IGDB_JSON', __DIR__.'/igdbData.json');
 
 /**
- * Esta función obtiene una lista de juegos de la API IGDB a partir de su titulo
+ * Esta función obtiene una lista de juegos de la API IGDB a partir de su titulo y un límite
  */
-function searchIgdbGameByName($name) {
+function searchIgdbGameByName($name, $limit) {
     // Revisamos que exista el nombre
     if (empty($name) || !is_string($name)){
         error_log("No se ha recibido name, se recibió: $name");
@@ -20,7 +20,7 @@ function searchIgdbGameByName($name) {
     $query = "
         fields id, name, cover, first_release_date;
         search \"$name\";
-        limit 10;
+        limit $limit;
     ";
     // Ejecutamos la query
     $response = consultaIGDB($query);
