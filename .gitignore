@@ -91,3 +91,4 @@ docker-compose.override.yml
 # Datos Sensibles
 # =========================
 igdbData.json
+steam.json
