@@ -54,16 +54,18 @@ CREATE TABLE IF NOT EXISTS users_data (
     FOREIGN KEY (language) REFERENCES languages(id)
 );
 -- Table for different providers (steam, Epic, GOG...)
-CREATE TABLE IF NOT EXISTS users_provider(
+CREATE TABLE IF NOT EXISTS users_providers(
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     provider VARCHAR(50) NOT NULL,
     -- We don't know their extension, so we use TEXT type 
+    steam_id VARCHAR(100), -- Este es exclusivo de Steam
     access_token TEXT,
     refresh_token TEXT,
     expires_at TIMESTAMP,
 
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_user_provider (user_id, provider)
 );
 -- Table for categories
 CREATE TABLE IF NOT EXISTS tags (
