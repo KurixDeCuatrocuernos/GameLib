@@ -13,7 +13,7 @@
     // DAO
     // ============================================================================
     /**
-     * Esta función devuelve un juego desde la base de datos
+     * Esta función devuelve un juego desde la base de datos a partir de su id
      * Devuelve el juego o nulo
      */
     function getGameById ($id){
@@ -26,6 +26,22 @@
             return null;
         }
     }
+
+    /**
+     *  Esta función devuelve un juego desde la base de datos a partir de su name
+     *  Devuelve el juego o nulo
+     */
+    function getGameByName($name) {
+        $sql = 'SELECT * FROM games WHERE name LIKE ? LIMIT 1'; // preparamos la consulta
+        $result = ejecutarQuery($sql, ["%$name%"]); // Ejecutamos la consulta
+        // Devolvemos el resultado si hay datos, o null si no hay datos.
+        if (!empty($result)) {
+            return $result[0];
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Esta función devuelve 20 juegos al azar de la base de datos
      * Devuelve un array con juegos
@@ -50,7 +66,7 @@
     /**
      * Esta función busca un juego en la base de datos a partir de su nombre
      * En cualquier caso se devolverá un array con un origen (db o igdb) y un array de arrays
-     * Importante, igdb devuelve cover, db devuelve cover, entre otras
+     * Importante, puede haber diferencias entre IGDB y la Base de datos
      */
     function searchGameByName($name) {
         if (empty($name) || !is_string($name)) {
@@ -61,7 +77,7 @@
         $result = ejecutarQuery($sql, ["%$name%"]);
         // Revisamos si hay datos
         if (empty($result)) {
-            $result = searchIgdbGameByName($name); // Buscamos el título en IGDB
+            $result = searchIgdbGameByName($name, 1); // Buscamos el título en IGDB
             // Devolvemos los datos de IGDB
             return [
                 'source' => 'igdb',
@@ -74,4 +90,44 @@
             'data' => $result
         ];
     }
+
+    /**
+     * Esta función inserta un juego en la base de datos
+     */
+    function insertGame($igdbId, $cover, $name, $date) {
+
+        if (empty($igdbId) || empty($name) || empty($date)) {
+            return false; // Si alguno de los parámetros está vacío devolvemos false
+        }
+
+        if (
+            !is_numeric($igdbId) ||
+            !is_string($name) ||
+            ($cover !== null && !is_string($cover))
+        ) {
+            return false; // Si alguno de los parámetros en inválido devolvemos false
+        }
+
+        if (!$date instanceof DateTime) {
+            try {
+                $date = new DateTime($date);
+            } catch (Exception $e) {
+                return false;
+            }
+        }
+
+        $formatedDate = $date->format('Y-m-d');
+
+        $sql = 'INSERT INTO games (igdb_id, name, cover, release_date)
+                VALUES (?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE
+                    name = VALUES(name),
+                    cover = VALUES(cover),
+                    release_date = VALUES(release_date)';
+
+        ejecutarQuery($sql, [$igdbId, $name, $cover, $formatedDate]);
+
+        return true;
+    }
+
 ?>
