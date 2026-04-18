@@ -2,6 +2,8 @@
     require_once __DIR__.'/../../database/db.php';
     require_once __DIR__.'/../commonFunctions.php';
     require_once __DIR__.'/./gameFunctions.php';
+
+    header('Content-Type: application/json');
     
     // Comprobamos que los datos vengan del POST
     if ($_SERVER['REQUEST_METHOD']!=='POST') {
@@ -24,7 +26,7 @@
         exit;
     }
     // Comprobamos que los datos tengan contenido
-    if (!isset($data['id']) || !isset($data["igdb_id"]) || !isset($data["cover_data"]) || 
+    if (!isset($data['id']) || !isset($data["igdb_id"]) || !isset($data["cover"]) || 
         !isset($data["name"]) || !isset($data["release_date"])
     ) {
         http_response_code(400); // Bad Request
@@ -32,7 +34,7 @@
         exit;
     }
     // Comprobamos que los datos tengan un formato correcto
-    $cell = checkInputGameData($data['id'], $data['igdb_id'], $data['name'], $data['cover_data'], $data['release_date']);
+    $cell = checkInputGameData($data['id'], $data['igdb_id'], $data['name'], $data['cover'], $data['release_date']);
     if (!$cell) {
         http_response_code(400); // Bad Request
         echo json_encode(["message" => "Alguno de los parámetros tiene un formato inadecuado"]); // Deberíamos redirigir al formulario y dar feedback
@@ -55,9 +57,9 @@
         $values[] = $data['name'];
     }
 
-    if ($oldGame['cover_data'] !== $data['cover_data']) {
-        $sets[] = 'cover_data = ?';
-        $values[] = $data['cover_data'];
+    if ($oldGame['cover'] !== $data['cover']) {
+        $sets[] = 'cover = ?';
+        $values[] = $data['cover'];
     }
 
     if ($oldGame['release_date'] !== $data['release_date']) {
@@ -105,8 +107,9 @@
             $cell = false;
         }
 
-        $json = json_decode($cover, true); 
-        if (json_last_error() !== JSON_ERROR_NONE) { // Comprobamos que cover es un JSON
+        if (!is_string($cover) || 
+            !filter_var($cover, FILTER_VALIDATE_URL) ||
+            !preg_match('/^https?:\\/\\//', $cover)) { // Comprobamos que cover es una URL Válida
             $cell = false;
         }
 

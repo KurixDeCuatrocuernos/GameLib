@@ -3,6 +3,8 @@
     require_once __DIR__.'/../commonFunctions.php';
     require_once __DIR__.'/./gameFunctions.php';
 
+    header('Content-Type: application/json');
+
     if ($_SERVER['REQUEST_METHOD']!=='POST') { // Lo correcto es usar GET
         http_response_code(405); // Not Allowed
         echo json_encode(["message" => "No hay POST"]); // Deberíamos redirigir de vuelta al index
@@ -45,10 +47,10 @@
     }
 
     http_response_code(200); // OK
-    echo json_encode(
-        ["message" => "Juego encontrado",
-        "data" => $game] 
-    ); // Deberíamos redirigir al formulario y dar feedback
+    echo json_encode([
+        "message" => "Juego encontrado",
+        "data" => $game
+    ]); // Deberíamos redirigir al formulario y dar feedback
     exit;
 
 ?>

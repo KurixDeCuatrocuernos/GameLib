@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS games (
     -- IGDB API ID
     igdb_id INT NOT NULL,
     -- JSON to creates the Image URL
-    cover_data JSON NOT NULL,
+    cover VARCHAR(255) NOT NULL,
     -- Title
     name VARCHAR(255) NOT NULL,
     release_date DATE NOT NULL,

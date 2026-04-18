@@ -4,6 +4,8 @@
     require_once __DIR__.'/../commonFunctions.php';
     require_once __DIR__.'/./gameFunctions.php';
 
+    header('Content-Type: application/json');
+
     if ($_SERVER['REQUEST_METHOD']!=='POST') { // Lo correcto es usar DELETE
         http_response_code(405); // Not Allowed
         echo json_encode(["message" => "No hay POST"]); // Deberíamos redirigir de vuelta al index

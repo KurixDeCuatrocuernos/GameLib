@@ -117,7 +117,7 @@ function getIgdbGameById($id) {
 
         // Si estamos aquí, hay datos 
 
-        $sql = 'INSERT INTO games(igdb_id, name, cover_data, release_date) VALUES (?, ?, ?, ?)';
+        $sql = 'INSERT INTO games(igdb_id, name, cover, release_date) VALUES (?, ?, ?, ?)';
         // Revisamos y transformamos los datos recibidos
         if (!is_string($gameData['name'])) {
             throw new Exception("el título del juego no es un string");
@@ -125,11 +125,9 @@ function getIgdbGameById($id) {
         $date = !empty($gameData['first_release_date'])
             ? date("Y-m-d", $gameData['first_release_date'])
             : date("Y-m-d");
-        $cover = !empty($gameData['cover'])
-            ? json_encode($gameData['cover'])
-            : json_encode([]);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new Exception("Error al codificar el cover de IGDB en JSON");
+        $cover = $gameData['cover'];
+        if (empty($cover) || !is_string($cover)) {
+            throw new Exception("No hay cover o no es una URL");
         }
         // Insertamos los datos
         ejecutarQuery($sql, [$id, $gameData['name'], $cover, $date]);
@@ -169,27 +167,20 @@ function getGameCoverById($id) {
         }
     }
 
-    // Decodificar JSON SIEMPRE antes de usarlo
-    if (empty($game['cover_data'])) {
-        error_log("El juego no tiene cover_data");
+    // Revisamos que haya cover
+    if (empty($game['cover'])) {
+        error_log("El juego no tiene cover");
         return $noCover;
     }
 
-    // Decodificamos el JSON
-    $arrayCover = json_decode($game['cover_data'], true);
-    // Revisamos errores de decodificación 
-    if (!is_array($arrayCover)) {
-        error_log("No se pudo decodificar el JSON");
-        return $noCover;
-    }
-    // Revisamos que haya URL
-    if (empty($arrayCover['url'])) {
-        error_log("El cover_data no contiene URL");
+    // Revisamos que el cover sea una URL
+    if (empty($game['cover']) || !is_string($game['cover'])) {
+        error_log("El cover no contiene URL");
         return $noCover;
     }
 
     // Construir URL final
-    $url = "https:" . $arrayCover['url'];
+    $url = "https:" . $game['cover'];
     $finalUrl = str_replace("t_thumb", "t_cover_big", $url);
 
     // Revisamos que la URL sea válida

@@ -8,11 +8,6 @@
         $d = DateTime::createFromFormat('Y-m-d', $fecha);
         return $d && $d->format('Y-m-d') === $fecha;
     }
-
-    function isJson($string) {
-        json_decode($string);
-        return (json_last_error() === JSON_ERROR_NONE);
-    }  
     
     // ============================================================================
     // DAO
@@ -34,6 +29,7 @@
     /**
      * Esta función devuelve 20 juegos al azar de la base de datos
      * Devuelve un array con juegos
+     * CUIDADO: Puede provocar Bucle infinito si no hay suficientes juegos insertados
      */
     function getRandomGamesByLimit() {        
         $maxId = ejecutarQuery('SELECT MAX(id) as max_id FROM games')[0]['max_id']; // Recogemos el máximo id de la base de datos actualmente
@@ -54,7 +50,7 @@
     /**
      * Esta función busca un juego en la base de datos a partir de su nombre
      * En cualquier caso se devolverá un array con un origen (db o igdb) y un array de arrays
-     * Importante, igdb devuelve cover, db devuelve cover_data, entre otras
+     * Importante, igdb devuelve cover, db devuelve cover, entre otras
      */
     function searchGameByName($name) {
         if (empty($name) || !is_string($name)) {

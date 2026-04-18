@@ -7,6 +7,8 @@
     require_once __DIR__.'/../commonFunctions.php';
     require_once __DIR__.'/gameFunctions.php';
 
+    header('Content-Type: application/json');
+
     if ($_SERVER["REQUEST_METHOD"] === 'POST') {
         $input = file_get_contents('php://input'); // Recogemos los datos con fetch
         $data = json_decode($input, true); // decodificamos los datos de json
@@ -19,31 +21,51 @@
 
         if(!empty($data)) {
             if(
-                isset($data["igdb_id"]) && 
-                isset($data["cover_data"]) && 
-                isset($data["name"]) && 
-                isset($data["release_date"])
-            ){  
-                $igdbId = trim($data["igdb_id"]); // id de igdb
+                !empty($data["igdb_id"]) && 
+                !empty($data["cover"]) && 
+                !empty($data["name"]) && 
+                !empty($data["release_date"])
+            ){   
+                if (!ctype_digit((string)$data['igdb_id'])){
+                    http_response_code(400); // Bad Request
+                    echo json_encode(["message" => "El id de Igdb no es válido"]); // Deberíamos redirigir al formulario y dar feedback
+                    exit;
+                }
+                $igdbId = (int)$data['igdb_id']; // id de igdb
+
+                if (!is_string($data['name']) || $data['name'] === '') {
+                    http_response_code(400);
+                    echo json_encode(["message" => "El nombre está vacío o es inválido"]); // Deberíamos redirigir al formulario y dar feedback
+                    exit;
+                }
                 $name = trim($data["name"]); // título
+
                 $fecha = DateTime::createFromFormat('Y-m-d', $data["release_date"]);
-                if (!$fecha) {
+                if (!$fecha || $fecha->format('Y-m-d') !== $data["release_date"]) {
                     http_response_code(400); // Bad Request
-                    echo json_encode(["message" => "la fecha no es convertible a tipo DATE"]); // Deberíamos redirigir al formulario y dar feedback
+                    echo json_encode(["message" => "La fecha no es convertible a tipo DATE"]); // Deberíamos redirigir al formulario y dar feedback
                     exit;
                 }
-                $fecha = $fecha->format('Y-m-d'); // Formato fecha
-                $cover = json_encode($data["cover_data"]); // formato JSON
-                // Ya tenemos los datos comprobados y guardados
-                
-                if ($cover === false) {
+                $fecha = $fecha->format('Y-m-d'); // Formato fecha 
+
+                if (empty($data['cover']) || !is_string($data['cover'])) {
                     http_response_code(400); // Bad Request
-                    echo json_encode(["message" => "Error al convertir en JSON"]); // Deberíamos redirigir al formulario y dar feedback
+                    echo json_encode(["message" => "No hay cover o no es un cover válido"]); // Deberíamos redirigir al formulario y dar feedback
                     exit;
                 }
+
+                $cover = trim($data['cover']);
+
+                if (!filter_var($cover, FILTER_VALIDATE_URL)) {
+                    http_response_code(400);
+                    echo json_encode(["message" => "El cover no es una URL válida"]);
+                    exit;
+                }
+
+                // Aquí los datos están comprobados 
                 
                 try {
-                    $sql = 'INSERT INTO games(igdb_id, cover_data, name, release_date) VALUES (?,?,?,?)';
+                    $sql = 'INSERT INTO games(igdb_id, cover, name, release_date) VALUES (?,?,?,?)';
                     ejecutarQuery($sql, [$igdbId, $cover, $name, $fecha]);
                     http_response_code(200); // OK
                     echo json_encode(["message" => "Juego guardado con éxito"]); // La redirección variará
