@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS users_games (
 
     FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_provider_id) REFERENCES users_provider(id) ON DELETE SET NULL,
+    FOREIGN KEY (user_provider_id) REFERENCES users_providers(id) ON DELETE SET NULL,
     UNIQUE KEY unique_users_games (user_id, game_id, user_provider_id)
 );
 
