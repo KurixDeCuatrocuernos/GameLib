@@ -2,6 +2,11 @@
 // Esta función es para que el usuario inicie sesión en su cuenta de Steam de forma segura
 // OJO, hay que informar adecuadamente al usuario de que vamos a usar y guardar esa información
 
+    require_once __DIR__.'/../../../database/db.php';
+    require_once __DIR__.'/../../commonFunctions.php';
+
+    // salirSiNoHaySesion('frontend/login'); // Redirigimos al Login
+
     $openid_url = "https://steamcommunity.com/openid/login";
 
     $params = [

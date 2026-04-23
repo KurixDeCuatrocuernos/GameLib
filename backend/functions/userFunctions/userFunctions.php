@@ -38,7 +38,7 @@ function getAllThemes () {
  * Esta función devuelve toda la información de la tabla languages
  */
 function getAllLanguages () {
-    $sql = 'SELECT * FROM themes';
+    $sql = 'SELECT * FROM languages';
     $result = ejecutarQuery($sql, []);
     return $result;
 }  
