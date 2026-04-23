@@ -156,4 +156,22 @@ function arrayToTable(array $datos, array $columnasOpcionales = []): string
     return $html;
 }
 
+/**
+ * Esta función sirve para detectar chars sospechosos dentro de un archivo CSV de cara a prevenir inyección de código vía CSV
+ * DEVUELVE true si es seguro o false si detecta un caracter extraño
+ */
+function isCsvSafe($content) {
+    $dangerous = ['=', '+', '-', '@', "\t=", "\t+", "\t-", "\t@"];
+    foreach ($content as $row) {
+        foreach ($row as $cell) {
+            $firstChar = substr(trim($cell), 0, 1);
+            if (in_array($firstChar, $dangerous)) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+
 ?>
