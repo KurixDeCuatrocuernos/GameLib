@@ -1,2 +1,15 @@
-@import 'tailwindcss';
+@import 'tailwindcss'; /* Importación de Tailwind */
 
+/* Variables CSS personales */
+:root{
+    /* Colores Basados en #84E33B en: https://htmlcolorcodes.com/es/circulo-cromatico/*/
+    --primary: #84E33B; /* Color Primario */
+    --secondary: #498F14; /* Color Secundario */
+    --tertiary: #35670F; /* Color Terciario */
+    --quaternary: #203E09; /* Color cuaternario */
+    --warning: #D8E33B; /* Color Aviso */
+    --danger: #E3463B; /* Color Error */
+    --dark: #0B1603; /* Color Negro */
+    --light: #F1FCE9; /* Color Blanco */
+    --success: #73DF20; /* Color Confirmación */
+}
