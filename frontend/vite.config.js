@@ -7,4 +7,13 @@ export default defineConfig({
   plugins: [
     react(), tailwindcss(),
   ],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:80/TFG/backend', changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
+      
+    }
+  }
 })
