@@ -1,6 +1,7 @@
 // Importamos funciones
-import { useState } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Children, useState } from 'react'
+import { Navigate, Routes, Route } from 'react-router-dom'
+import { useAuth } from './contexts/AuthContext' // Importamos el contexto
 // Importamos nuestras páginas
 import Navbar from './components/Navbar'
 import Dashboard from './pages/Dashboard'
@@ -8,6 +9,26 @@ import Login from './pages/Login'
 import Signup from './pages/Signup'
 
 function App() {
+
+  // Componente que protege rutas privadas
+  const PrivateRoute = ({children}) => {
+    const { user, loading } = useAuth()
+    if (loading) return <div>Cargando...</div> // Se puede crear un componente para mostrar la carga
+    if (!user) return <Navigate to="/login" replace /> // Si no tiene acceso redirigimos a Login
+    return children
+  }
+
+  // Componente que protege rutas de invitados (login, signup)
+  const GuestRoute = ({ children }) => {
+      const { user, loading } = useAuth()
+      
+      if (loading) return <div>Cargando...</div> // Se puede crear un componente para mostrar la carga
+      if (user) return <Navigate to="/" replace /> // Si no tiene acceso redirigimos a Inicio
+      return children
+  }
+
+
+
 
   return (
     <>
@@ -17,9 +38,17 @@ function App() {
         {/* Inicio */}
         <Route path="/" element={<Dashboard />} /> 
         {/* Login */}
-        <Route path='/login' element={<Login />} />
+        <Route path='/login' element={
+          <GuestRoute>
+            <Login />
+          </GuestRoute> } 
+        />
         {/* Registro */}
-        <Route path='/signup' element={<Signup />} />
+        <Route path='/signup' element={
+          <GuestRoute>
+            <Signup />
+          </GuestRoute> } 
+        />
         
       </Routes>
     </>

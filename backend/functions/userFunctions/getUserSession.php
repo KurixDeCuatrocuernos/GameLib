@@ -40,7 +40,7 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-$sql = 'SELECT u.name as username, r.name as role_name 
+$sql = 'SELECT u.id AS user_id, u.name AS username, r.name AS role_name 
         FROM users u 
         JOIN roles r ON u.role = r.id
         WHERE u.id = ? 
@@ -58,6 +58,7 @@ if (empty($result[0])) {
 
 http_response_code(200); // OK
 echo json_encode([
+    "userId" => $result[0]['user_id'],
     "username" => $result[0]['username'],
     "role" => $result[0]['role_name']
 ]); // Redirigimos al formulario y damos feedback GENÉRICO                    

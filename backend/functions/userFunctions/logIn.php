@@ -76,7 +76,10 @@ $_SESSION["role"] = $user["role"];
 
 http_response_code(200); // OK
 echo json_encode([
-    "message" => "Se ha iniciado sesión con éxito"
+    "message" => "Se ha iniciado sesión con éxito",
+    "userId" => $user["id"],
+    "username" => $user["name"],
+    "role" => $user["role"]
 ]); // Redirigimos al formulario y damos feedback GENÉRICO                    
 exit;
 
