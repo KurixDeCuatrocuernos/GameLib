@@ -7,6 +7,8 @@ import Navbar from './components/Navbar'
 import Dashboard from './pages/Dashboard'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
+import Synchronize from './pages/Synchronize'
+import SteamCallback from './pages/SteamCallback'
 
 function App() {
 
@@ -49,6 +51,14 @@ function App() {
             <Signup />
           </GuestRoute> } 
         />
+        {/* Vincular Librerías */}
+        <Route path='/synchronize' element={
+          <PrivateRoute>
+            <Synchronize />
+          </PrivateRoute> } 
+        />
+
+        <Route path="/steam-callback" element={<SteamCallback />} />
         
       </Routes>
     </>
