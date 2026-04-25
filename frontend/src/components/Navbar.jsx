@@ -18,10 +18,10 @@ const Navbar = () => {
     if (loading) {
         return (
             <header>
-                <div className="flex flex-row justify-between items-center m-5">
+                <div className="flex flex-row justify-between items-center m-5 me-5 ">
                     <div className="flex flex-row items-center">
                         <a href="/">
-                            <img className="w-20 me-5" src="/gamepad-Icon.png" alt="Logo" />
+                            <img className="w-20 h-20" src="/gamepad-Icon.png" alt="Logo" />
                         </a>
                         <a className="text-4xl font-bold italic text-green-200" href="/">
                             Game Library
@@ -34,24 +34,27 @@ const Navbar = () => {
 
     return (<header>
         <div >
-            <div className="flex flex-row justify-between items-center m-5">
-                <div>
+            <div className="flex flex-row justify-between items-center w-full bg-green-950 p-5">
+                {/* TITULO */}
+                <div className="flex flex-row items-center gap-2">
                     <a href="/">
-                        <img className="w-20 me-5"
+                        <img className="w-20 h-20"
                         src="/gamepad-Icon.png" alt="Logo del proyecto" />
                     </a>
-                <a className="text-4xl font-bold italic text-green-200" 
-                    href="/" >Game Library</a>
+                    <a className="text-4xl font-bold italic text-green-200" 
+                        href="/" >Game Library</a>
                 </div>
-
+                {/* SESIÓN DEL USUARIO */}
                 {user ? (  
-                    <div className="flex flex-row w-30">
-                        <div className="flex flex-col">
-                            <p className="text-2xl mr-5">{user.username}</p>
-                            <p className="">{user.role}</p>
-                            <button type="button" onClick={cerrarSesion}>Cerrar Sesión</button>
+                    <div className="flex flex-row">
+                        <div className="flex flex-col justify-center items-center">
+                            <p className="text-2xl font-bold mr-5">{user.username}</p>
+                            <p className="italic font-bold">{user.role}</p>
+                            <button type="button" onClick={cerrarSesion} 
+                                className="bg-green-100 text-black font-bold w-30 py-2 rounded-3xl hover:cursor-pointer hover:bg-green-950 hover:text-green-50">
+                                Cerrar Sesión</button>
                         </div>
-                        <img src="/gamepad-Icon.png" alt="User's Picture" className="w-15"/>
+                        <img src="/gamepad-Icon.png" alt="User's Picture" className="w-20 h-20"/>
                     </div>)
                 : (
                     <div className="flex gap-2">
@@ -64,6 +67,7 @@ const Navbar = () => {
             </div>
             
         </div>
+        {/* NAV */}
         <nav className="flex flex-row gap-4 justify-evenly items-center w-full text-2xl font-bold italic">
             {!user ? (
                 <>
@@ -81,7 +85,7 @@ const Navbar = () => {
                 </>
             )}
             <a className=" hover:text-green-950" 
-                href="">Enlace 3</a>
+                href="/synchronize">Synchronize Libraries</a>
             <p>/</p>
             <a className=" hover:text-green-950" 
                 href="">Enlace 4</a>
