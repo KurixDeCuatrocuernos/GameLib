@@ -1,4 +1,6 @@
-// frontend/src/pages/SteamCallback.jsx
+/**
+ * Esta Página hace de intermediario entre las llamadas para obtener el id de Steam y la creación del user_provider con los datos del usuario y el id de steam
+ */
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,28 +20,28 @@ const SteamCallback = () => {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
                     body: params.toString()
-                });
+                }); // Llamamos a return.php en el backend
 
                 const result = await response.json();
 
                 if (result.success) {
-                    setStatus('¡Cuenta de Steam vinculada con éxito! Redirigiendo...');
-                    setTimeout(() => navigate('/synchronize?steam_success=true'), 2000);
+                    setStatus('¡Cuenta de Steam vinculada con éxito! Redirigiendo...'); // Si todo sale bien mostramos una confirmación
+                    setTimeout(() => navigate('/synchronize?steam_success=true'), 2000); // pasados 2 segundos redirigimos a Synchronized.jsx
                 } else {
-                    setStatus(`Error: ${result.message}. Redirigiendo...`);
-                    setTimeout(() => navigate(`/synchronize?steam_error=${result.error}`), 2000);
+                    setStatus(`Error: ${result.message}. Redirigiendo...`); // Si da error mostramos un mensaje de error
+                    setTimeout(() => navigate(`/synchronize?steam_error=${result.error}`), 2000); // Pasados 2 segundos redirigimos a Synchornized.jsx con el error
                 }
             } catch (error) {
                 console.error('Error al procesar autenticación:', error);
-                setStatus('Error de conexión. Redirigiendo...');
-                setTimeout(() => navigate('/synchronize?steam_error=connection_failed'), 2000);
+                setStatus('Error de conexión. Redirigiendo...'); // Si hay un error durante la conexión lo mostramos
+                setTimeout(() => navigate('/synchronize?steam_error=connection_failed'), 2000); // Redirigimos a Synchronized.jsx y mostramos el error
             }
         };
 
         if (params.toString()) {
-            completeSteamLink();
+            completeSteamLink(); // Si hay parámetros en la url que nos manda Steam realizanos la llamada a return.php
         } else {
-            navigate('/synchronize');
+            navigate('/synchronize'); // Si no hay parámetros volvemos a Synchronize.jsx
         }
     }, [navigate]);
 
