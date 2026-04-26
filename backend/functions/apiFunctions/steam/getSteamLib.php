@@ -43,12 +43,14 @@ $steamId = $result[0]['steam_id'];
 
 try {
 
-    $steamGamesNames = getSteamGamesNames($steamId);
+    $steamGamesNames = [
+                "Star Wars: Jedi Fallen Order"
+            ]; // getSteamGamesNames($steamId); // Si no funciona puede usarse un Array de títulos
     
     if (empty($steamGamesNames)) {
         http_response_code(200); // La consulta ha sido correcta, pero no hay juegos (puede ocurrir)
         echo json_encode([
-            "message" => "No se han encontrado juegos en tu biblioteca de Steam" // Deberíamos filtrar las posibles respuestas del código 200 para ver si es o no correcto 
+            "message" => "No se han encontrado juegos en tu biblioteca de Steam, asegúrate de que tu perfil de Steam sea público en Perfil > Privacidad" // Deberíamos filtrar las posibles respuestas del código 200 para ver si es o no correcto 
         ]);
         exit; 
     }
@@ -61,23 +63,63 @@ try {
         
         $game = getGameByName($gameName); // Recogemos cada juego por su nombre
         
+        
         if (!$game) {
+            
+            
             $igdbResult = searchGameByName($gameName); // Buscamos el juego en IGDB
             
-            if (!empty($igdbResult)) {
-                $igdbGame = $igdbResult[0]; // Recogemos sólo el primer juego
+            // Llega bien hasta aquí
+            if (!empty($igdbResult) && is_array($igdbResult['data'])) {
+                // http_response_code(200); // OK
+                // echo json_encode([
+                //     "message" => "Se encontró el juego en IGDB",
+                // ]);
+                // exit;
+                $igdbGame = $igdbResult['data']; // Recogemos sólo el primer juego
+                // http_response_code(200); // OK
+                // echo json_encode([
+                //     "message" => "Id del juego Procesado, se procederá a Insertar",
+                // ]);
+                // exit;
                 $igdbId = $igdbGame['id']; // Recogemos el Id
                 $name = $igdbGame['name']; // Recogemos el nombre del juego
-                $cover = $igdbGame['cover'] ?? null; // Recogemos el cover del juego
+                
+                $cover = null;
+                if (isset($igdbGame['cover']) && is_array($igdbGame['cover'])) {
+                    // Si cover es un array con 'url'
+                    $cover = $igdbGame['cover']['url'] ?? null;
+                } elseif (is_string($igdbGame['cover'])) {
+                    // Si cover es directamente un string (ID)
+                    $cover = $igdbGame['cover'];
+                }
+                
+                // Si tenemos una URL, nos aseguramos de que sea completa
+                if ($cover && !str_starts_with($cover, 'http')) {
+                    $cover = "https:" . $cover;
+                }
+                
+                // Si no hay cover, usamos una imagen por defecto
+                if (empty($cover)) {
+                    $cover = "https://placehold.co/300x450?text=No+Cover";
+                }  
+
                 $releaseDate = !empty($igdbGame['first_release_date'])
                     ? date('Y-m-d', $igdbGame['first_release_date'])
                     : date('Y-m-d');
-                
+            
                 insertGame($igdbId, $cover, $name, $releaseDate);
                 $game = getGameByName($name);
 
             } 
+
         }
+
+        // http_response_code(200); // OK
+        // echo json_encode([
+        //     "message" => "Biblioteca de Steam Sincronizada Sin errores",
+        // ]);
+        // exit;
 
         if ($game) {
             $sql = 'INSERT INTO users_games (game_id, user_id, user_provider_id)
@@ -93,7 +135,7 @@ try {
         }
     }
 
-    http_response_code(200); // Success
+    http_response_code(200); // OK
     echo json_encode([
         "message" => "Biblioteca de Steam Sincronizada",
         "inserted" => $insertedGames,
@@ -101,21 +143,14 @@ try {
         "total" => count($steamGamesNames),
         "failed_games" => $failedGames
     ]);
+    exit;
 
 } catch (Exception $ex) {
     http_response_code(500); // Internal Server Error
     echo json_encode([
         "message" => "Error al sincronizar: ".$ex->getMessage() //Ha ocurrido algún error, por lo que lo mostramos
     ]);
+    exit;
 }
-
-
-
-
-
-
-
-
-
 
 ?>

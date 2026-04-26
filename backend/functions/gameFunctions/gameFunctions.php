@@ -63,33 +63,54 @@
         }
         return $games; // Devolvemos un array de juegos recogidos
     }
-    /**
-     * Esta función busca un juego en la base de datos a partir de su nombre
-     * En cualquier caso se devolverá un array con un origen (db o igdb) y un array de arrays
-     * Importante, puede haber diferencias entre IGDB y la Base de datos
-     */
-    function searchGameByName($name) {
-        if (empty($name) || !is_string($name)) {
-            throw new Exception("El nombre proporcionado no es válido");
-        }
-        $name = trim(str_replace('"','', $name)); // Eliminamos posibles comillas y espacios para evitar errores en la consulta
-        $sql = 'SELECT * FROM games WHERE name LIKE ?';
-        $result = ejecutarQuery($sql, ["%$name%"]);
-        // Revisamos si hay datos
-        if (empty($result)) {
-            $result = searchIgdbGameByName($name, 1); // Buscamos el título en IGDB
-            // Devolvemos los datos de IGDB
-            return [
-                'source' => 'igdb',
-                'data' => $result
-            ]; 
-        }
-        // Devolvemos los datos de la base de datos
+/**
+ * Esta función busca un juego en la base de datos a partir de su nombre
+ * Si no lo encuentra, lo busca en IGDB
+ * Devuelve un array con 'source' (db o igdb) y 'data' (el juego o null)
+ */
+function searchGameByName($name) {
+    if (empty($name) || !is_string($name)) {
+        throw new Exception("El nombre proporcionado no es válido");
+    }
+    $name = trim(str_replace('"','', $name));
+    $sql = 'SELECT * FROM games WHERE name LIKE ?';
+    $result = ejecutarQuery($sql, ["%$name%"]);
+    
+    // Caso 1: Está en la BD local
+    if (!empty($result)) {
         return [
             'source' => 'db',
-            'data' => $result
+            'data' => $result[0]  // ← Un solo juego
         ];
     }
+    
+    // Caso 2: Buscamos en IGDB
+    $igdbResult = searchIgdbGameByName($name, 1);
+    
+    if (!empty($igdbResult) && is_array($igdbResult)) {
+        // IGDB puede devolver un array de juegos o un solo juego
+        if (isset($igdbResult['id'])) {
+            // Es un solo juego
+            $game = $igdbResult;
+        } else {
+            // Es un array de juegos
+            $game = $igdbResult[0] ?? null;
+        }
+        
+        if ($game) {
+            return [
+                'source' => 'igdb',
+                'data' => $game  // ← Un solo juego
+            ];
+        }
+    }
+    
+    // Caso 3: No encontrado ni en la base de datos ni en IGDB
+    return [
+        'source' => null,
+        'data' => null
+    ];
+}
 
     /**
      * Esta función inserta un juego en la base de datos

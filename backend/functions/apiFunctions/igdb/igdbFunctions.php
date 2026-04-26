@@ -18,7 +18,7 @@ function searchIgdbGameByName($name, $limit) {
     $name = str_replace(['"', "'"], '', $name); // Eliminamos posibles comillas para evitar errores en la consulta
     // Preparamos la query
     $query = "
-        fields id, name, cover, first_release_date;
+        fields id, name, cover.url, first_release_date;
         search \"$name\";
         limit $limit;
     ";

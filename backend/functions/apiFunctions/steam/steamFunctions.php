@@ -37,36 +37,53 @@ function getSteamApiKey() {
  * Esta función recupera la lista de juegos en la biblioteca de un usuario de Steam
  * Devuelve una lista de strings con nombres de juegos
  */
-function getSteamGamesNames ($steamId) {
-    $apiKey = getSteamApiKey(); // Recogemos la api key
+function getSteamGamesNames($steamId) {
+    $apiKey = getSteamApiKey();
     
     $url = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?" . http_build_query([
         "key" => $apiKey, 
         "steamid" => $steamId,
         "include_appinfo" => 1,
         "include_played_free_games" => 1
-    ]); // Preparamos la URL para la consulta
-
-    $response = file_get_contents($url); // Recogemos la respuesta de la consulta
-
+    ]);
+    
+    error_log("[STEAM API] URL: " . $url);
+    
+    $response = file_get_contents($url);
+    
     if ($response === false) {
+        error_log("[STEAM API] ERROR: No se pudo obtener la respuesta");
         throw new Exception("No se pudo obtener la biblioteca de Steam");
     }
-
-    $data = json_decode($response, true); // Decodificamos el JSON
-
-    if (
-        json_last_error() !== JSON_ERROR_NONE ||
-        !isset($data["response"]["games"])
-    ) {
-        // Steam devuelve vacío si el perfil es privado o no tiene juegos
-        return []; // Si nos ha devuelto un array vacío devolvemos null
+    
+    error_log("[STEAM API] Respuesta recibida: " . substr($response, 0, 500));
+    
+    $data = json_decode($response, true);
+    
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        error_log("[STEAM API] ERROR JSON: " . json_last_error_msg());
+        return [];
     }
-
+    
+    error_log("[STEAM API] Datos decodificados: " . print_r($data, true));
+    
+    // Verificar si la respuesta tiene la estructura esperada
+    if (!isset($data["response"]["games"])) {
+        error_log("[STEAM API] No se encontró 'games' en la respuesta. Perfil privado o sin juegos.");
+        
+        // Verificar si hay mensaje de error
+        if (isset($data["response"]["error"])) {
+            error_log("[STEAM API] Error de Steam: " . $data["response"]["error"]);
+        }
+        
+        return [];
+    }
+    
     $games = $data["response"]["games"];
-
+    error_log("[STEAM API] Número de juegos encontrados: " . count($games));
+    
     return array_map(function ($game) {
-        return $game["name"] ?? "Unknown"; // Devolvemos sólo los nombres de los juegos
+        return $game["name"] ?? "Unknown";
     }, $games);
 }
 
