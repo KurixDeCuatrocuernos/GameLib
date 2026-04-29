@@ -92,3 +92,4 @@ docker-compose.override.yml
 # =========================
 igdbData.json
 steam.json
+demo/

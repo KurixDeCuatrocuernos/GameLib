@@ -12,10 +12,18 @@ require_once __DIR__.'/../../gameFunctions/gameFunctions.php'; // Importamos las
 require_once __DIR__.'/../igdb/igdbFunctions.php'; // Importamos las funciones de IGDB
 require_once __DIR__.'/gogFunctions.php'; // Importamos las funciones de gog
 
+// Habilitamos CORS para REACT:
+header("Access-Control-Allow-Origin: http://localhost:5173"); // Dirección de React
+header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header('Content-Type: application/json');
 
-// Iniciar sesión y verificar usuario autenticado
-iniciarSesionSiNoActiva();
+// DESACTIVADO EN DESARROLLO, PERO RECOMENDABLE EN PRODUCCIÓN PARA PREVENIR ATAQUES DE DDOS
+set_time_limit(300); // Establecemos 5 minutos como límite para procesar toda la sincronización
+
+
+iniciarSesionSiNoActiva();// Iniciar sesión y verificar usuario autenticado
 
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401); // Forbidden
@@ -28,7 +36,7 @@ if (!isset($_SESSION['user_id'])) {
 $userId = $_SESSION['user_id']; // Guardamos el id del usuario
 
 $maxFileSize = 5 * 1024 * 1024; // Tamaño máximo de archivo: 5 MB 
-$allowedMimeTypes = ['text/csv', 'text/plain']; // Tipos MIME permitidos CSV y TXT
+$allowedMimeTypes = ['text/csv']; // Tipos MIME permitidos CSV y TXT
 $maxRows = 10000; // Extensión máxima permitida 
 
 if (!isset($_FILES['csv_file'])) {
@@ -67,6 +75,7 @@ if (!in_array($fileExt, ['csv', 'txt'])) {
     ]); // Habría que redirigir al formulario y dar feedback
     exit;
 }
+
 // Verificamos el tamaño del archivo
 if ($_FILES['csv_file']['size'] > $maxFileSize) {
     http_response_code(400); // Bad Request
@@ -98,7 +107,6 @@ if ($fileHandle === false) {
     ]); // Habría que redirigir al formulario y dar feedback
     exit;
 }
-
 
 // Detectamos el delimitador (coma, punto y coma, o tabulador)
 $firstLine = fgets($fileHandle);
@@ -133,6 +141,7 @@ while (($row = fgetcsv($fileHandle, 0, $detectedDelimiter)) !== false && $rowCou
     $csvContent[] = $row;
     $rowCount++;
 }
+
 // Verificamos que el número de filas no sea demasiado grande
 if ($rowCount >= $maxRows) {
     fclose($fileHandle); // Cerramos el archivo antes de salir
@@ -182,6 +191,7 @@ foreach ($firstRow as $cell) {
         break;
     }
 }
+
 // Si se parece al encabezado guardamos la columna
 if ($looksLikeHeader) {
     $headers = $firstRow;
@@ -202,18 +212,34 @@ if ($headers !== null) {
     }
 }
 
-$providerId = getGogProvider($userId); // Recogemos el provider del usuario o o creamos
+// Detectamos la columna de plataforma
+$platformColumnIndex = null;
+$platformKeywords = ['platformlist', 'platform', 'store', 'source', 'launcher', 'provider'];
+
+if ($headers !== null) {
+    foreach ($headers as $index => $columnName) {
+        $columnLower = strtolower(trim($columnName));
+        foreach ($platformKeywords as $keyword) {
+            if (strpos($columnLower, $keyword) !== false) {
+                $platformColumnIndex = $index;
+                break 2;
+            }
+        }
+    }
+}
 
 global $conexion;
 mysqli_begin_transaction($conexion); // Iniciamos una transacción para garantizar integridad
 
 try {
     // Procesamos los juegos
-    $inserted = 0;
-    $failed = 0;
-    $failedGames = [];
-    $alreadyExists = 0;
-
+    $inserted = 0; // Contador de juegos insertados
+    $failed = 0; // Contador de Juegos fallidos
+    $failedGames = []; // Lista de nombres de juegos fallidos
+    $alreadyExists = 0; // Contador de Juegos que ya existen
+    $excluded = 0; // Contador de juegos excluidos porque la plataforma no está soportada
+    $excludedGames = []; // Lista de nombres de juegos excluidos
+    
     foreach ($csvContent as $rowIndex => $row) {
         // Nos saltamos las filas de encabezado
         if ($rowIndex < $dataStartRow) {
@@ -228,6 +254,24 @@ try {
         }
 
         $gameName = trim($row[$gameColumnIndex]); // Recogemos el título del juego
+
+
+        // Detectar plataforma para este juego
+        $platform = null; // valor por defecto
+        
+        if ($platformColumnIndex !== null && isset($row[$platformColumnIndex])) {
+            $platform = extractPlatformFromList($row[$platformColumnIndex]);
+        }
+
+        // Si la plataforma no es Steam, Epic o GOG, excluimos el juego y omitimos la fila
+        if ($platform === null) {
+            $excluded++;
+            $excludedGames[] = "Fila " . ($rowIndex + 1) . ": " . $gameName . " (" . ($row[$platformColumnIndex] ?? 'plataforma desconocida') . ")";
+            continue;
+        }
+
+        // Obtenemos o creamos el provider para esa plataforma
+        $providerId = getOrCreateProvider($userId, $platform);
         
         if (empty($gameName)) {
             $failed++;
@@ -236,18 +280,37 @@ try {
         }
         
         $game = getGameByName($gameName); // Buscamos el juego en la base de datos
-        
+
         // Si no existe, buscamos el juego en IGDB
         if (!$game) {
             try {
                 $igdbResult = searchGameByName($gameName); // Buscamos por título
                 // Si lo encontramos lo guardamos
                 if (!empty($igdbResult['data'])) {
-                    $igdbGame = $igdbResult['data'][0];
+                    $igdbGame = $igdbResult['data'];
                     
                     $igdbId = $igdbGame['id'];
                     $name = $igdbGame['name'];
-                    $cover = $igdbGame['cover'] ?? null;
+                    
+                    // Revisamos el cover del juego
+                    $cover = null;
+                    if (isset($igdbGame['cover']) && is_array($igdbGame['cover'])) {
+                        // Si cover es un array con 'url'
+                        $cover = $igdbGame['cover']['url'] ?? null;
+                    } elseif (is_string($igdbGame['cover'])) {
+                        // Si cover es directamente un string (ID)
+                        $cover = $igdbGame['cover'];
+                    }                    
+                    // Si tenemos una URL, nos aseguramos de que sea completa
+                    if ($cover && !str_starts_with($cover, 'http')) {
+                        $cover = "https:" . $cover;
+                    }
+                    // Si no hay cover, usamos una imagen por defecto
+                    if (empty($cover)) {
+                        $cover = "https://placehold.co/300x450?text=No+Cover";
+                    }
+                    
+                    // Verificamos la fecha
                     $releaseDate = !empty($igdbGame['first_release_date'])
                         ? date('Y-m-d', $igdbGame['first_release_date'])
                         : date('Y-m-d');
@@ -256,7 +319,11 @@ try {
                     $game = getGameByName($name); // Recogemos el juego de nuestra base de datos
                 }
             } catch (Exception $e) { // Si hay un error lo mostramos
-                error_log("Error buscando '$gameName' en IGDB: " . $e->getMessage()); 
+                http_response_code(500); // Internal Server Error
+                echo json_encode([
+                    "message" => "Error buscando '$gameName' en IGDB: " . $e->getMessage()
+                ]);
+                exit;
             }
         }
         
@@ -288,10 +355,11 @@ try {
         "inserted" => $inserted,
         "already_exists" => $alreadyExists,
         "failed" => $failed,
+        "excluded" => $excluded,
         "total_processed" => $inserted + $alreadyExists + $failed,
-        "failed_games" => $failedGames
+        "failed_games" => $failedGames,
+        "excluded_games" => $excludedGames
     ]); // Habría que volver a la biblioteca mostrando los nuevos juegos insertados (filtro de GOG o algo así)
-
 } catch (Exception $ex) {
     mysqli_rollback($conexion); // Si algo ha ido mal revertimos la transacción
     error_log("Error en la importación de GOG: ".$ex->getMessage());
@@ -300,6 +368,7 @@ try {
         "message" => "Error durante la importación. No se ha añadido ningún juego.",
     ]); // Habría que volver al formulario y dar feedback
 }
+
 
 exit; // Fin de la sincronización
 
