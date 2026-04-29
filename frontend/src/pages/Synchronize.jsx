@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
 import { useAuth } from '../contexts/AuthContext'
+import GogLinkGuide from "../components/GogLinkGuide"
+import GogSynchronization from "../components/GogSynchronization"
+import MessageDisplay from "../components/MessageDisplay"
 
 const Synchronize = () => {
     
@@ -93,21 +96,10 @@ const Synchronize = () => {
         window.location.href = '/api/functions/apiFunctions/steam/steamLogin.php'
     }
 
-    const MessageDisplay = () => {
-        if (!message) return null
-        return (
-            <div className={`fixed top-20 left-1/2 transform -translate-x-1/2 p-4 rounded-lg shadow-lg z-50 ${
-                message.type === 'success' ? 'bg-green-600' : 'bg-red-600'
-            } text-white`}>
-                {message.text}
-            </div>
-        )
-    }
-
     // Pantalla principal: mostrar opciones
     if (!syncGog && !syncSteam) return (
         <div className="bg-gray-900 border-2 border-green-100 w-auto m-5 rounded-3xl p-10 flex flex-col gap-10 justify-evenly items-center">
-            <MessageDisplay />
+            <MessageDisplay message={message} setMessage={setMessage}/> {/* Mensaje de error o confirmación */}
             
             {/* Botón Steam */}
             <div className="flex flex-col items-center gap-3">
@@ -137,7 +129,7 @@ const Synchronize = () => {
             <button className="flex flex-row gap-5 items-center hover:bg-gray-800 hover:cursor-pointer rounded-2xl p-5"
                 onClick={() => setSyncGog(true)}>
                 <img src="/gog_icon_light.png" alt="Icono de GOG" className="w-20 bg-black border-white border-2 rounded-3xl"/>
-                <h3 className="font-semibold text-3xl">Link GOG's Library</h3>
+                <h3 className="font-semibold text-3xl">Link By GOG Galaxy's CSV File</h3>
             </button>
         </div>
     )
@@ -148,7 +140,7 @@ const Synchronize = () => {
             <button type="button" onClick={() => setSyncSteam(false)} className="hover:cursor-pointer text-2xl self-start">
                 ↩️ Back
             </button>
-            <MessageDisplay />
+            <MessageDisplay message={message} setMessage={setMessage}/> {/* Mensaje de error o confirmación */}
             <h1 className="text-3xl font-bold">Linking Steam's Library</h1>
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-400"></div>
             <p className="text-gray-300">Redirecting to Steam...</p>
@@ -156,32 +148,10 @@ const Synchronize = () => {
     )
 
     // Pantalla de vinculación de GOG
-    if (!syncSteam && syncGog) return (
-        <div className="bg-gray-900 border-2 border-green-100 w-auto m-5 rounded-3xl p-10 flex flex-col gap-10 justify-evenly items-center">
-            <button type="button" onClick={() => setSyncGog(false)} className="hover:cursor-pointer text-2xl self-start">
-                ↩️ Back
-            </button>
-            <MessageDisplay />
-            <h1 className="text-3xl font-bold">Linking GOG's Library</h1>
-            <p className="text-gray-300 text-center">
-                GOG doesn't offer a public API.<br />
-                Please export your library from GOG Galaxy and upload the CSV file.
-            </p>
-            <form className="flex flex-col gap-4">
-                <input 
-                    type="file" 
-                    accept=".csv,.txt"
-                    className="bg-gray-700 text-white p-2 rounded cursor-pointer"
-                />
-                <button 
-                    type="submit"
-                    className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                >
-                    Upload CSV File
-                </button>
-            </form>
-        </div>
-    )
+    if (!syncSteam && syncGog) return (<>
+        <GogSynchronization setSyncGog={setSyncGog}/>
+        <GogLinkGuide />
+    </>)
 }
 
 export default Synchronize
