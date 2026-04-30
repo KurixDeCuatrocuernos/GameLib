@@ -41,7 +41,7 @@
 
     $gameList = [];
     foreach ($response as $game) {
-        $gameList[] = $game['name'];
+        $gameList[] = $game; // Devolvemos el juego completo
     }
 
     http_response_code(200); // Consulta correcta, pero vacía

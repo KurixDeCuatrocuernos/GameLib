@@ -9,10 +9,11 @@ import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Synchronize from './pages/Synchronize'
 import SteamCallback from './pages/SteamCallback'
+import GameForm from './pages/GameForm'
 
 function App() {
 
-  // Componente que protege rutas privadas
+  // Componente que protege rutas privadas (requieren estar logueado)
   const PrivateRoute = ({children}) => {
     const { user, loading } = useAuth()
     if (loading) return <div>Cargando...</div> // Se puede crear un componente para mostrar la carga
@@ -57,6 +58,12 @@ function App() {
             <Synchronize />
           </PrivateRoute> } 
         />
+
+        <Route path='/game-form' element={
+          <PrivateRoute>
+            <GameForm />
+          </PrivateRoute>
+        } />
 
         <Route path="/steam-callback" element={<SteamCallback />} />
         

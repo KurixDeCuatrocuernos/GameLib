@@ -46,7 +46,7 @@ const Navbar = () => {
                         href="/" >Game Library</a>
                 </div>
 
-                <Navigator />
+                {/* <Navigator /> */}
 
                 {/* SESIÓN DEL USUARIO */}
                 {user ? (  

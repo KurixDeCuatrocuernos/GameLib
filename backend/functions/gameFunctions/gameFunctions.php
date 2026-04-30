@@ -151,4 +151,15 @@ function searchGameByName($name) {
         return true;
     }
 
+    /**
+     * Busca un juego por su ID de IGDB
+     * @param int $igdbId ID del juego en IGDB
+     * @return array|null El juego encontrado o null
+     */
+    function getGameByIgdbId($igdbId) {
+        $sql = 'SELECT * FROM games WHERE igdb_id = ? LIMIT 1';
+        $result = ejecutarQuery($sql, [$igdbId]);
+        return !empty($result) ? $result[0] : null;
+    }
+
 ?>

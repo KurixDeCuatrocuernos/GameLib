@@ -92,13 +92,20 @@ const GogSynchronization = ({ setSyncGog }) => {
                 disabled={isLoading}
                 className="bg-gray-700 text-white p-2 rounded cursor-pointer"
             />
-            <button 
-                type="submit"
-                disabled = {isLoading}
-                className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-            >
-            {isLoading ? 'Subiendo y procesando...' : 'Upload CSV File'}
-            </button>
+            {!isLoading ? (
+                <button 
+                    type="submit"
+                    disabled = {isLoading}
+                    className={isLoading ? "bg-gray-400" : "bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700 hover:cursor-pointer"}
+                >
+                Upload CSV File
+                </button>
+            ) :  (
+                <div className="flex items-center gap-2 text-green-400">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-400"></div>
+                    <span>Sincronizando juegos...</span>
+                </div>
+            )}
         </form>
     </div>)
 } 

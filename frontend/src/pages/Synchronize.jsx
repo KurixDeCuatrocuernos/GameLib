@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react"
-import { useSearchParams } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { useAuth } from '../contexts/AuthContext'
 import GogLinkGuide from "../components/GogLinkGuide"
 import GogSynchronization from "../components/GogSynchronization"
 import MessageDisplay from "../components/MessageDisplay"
 
 const Synchronize = () => {
-    
+    const navigate = useNavigate()
+
     const [searchParams] = useSearchParams()
     const [message, setMessage] = useState(null)
     const [syncSteam, setSyncSteam] = useState(false)
@@ -130,6 +131,12 @@ const Synchronize = () => {
                 onClick={() => setSyncGog(true)}>
                 <img src="/gog_icon_light.png" alt="Icono de GOG" className="w-20 bg-black border-white border-2 rounded-3xl"/>
                 <h3 className="font-semibold text-3xl">Link By GOG Galaxy's CSV File</h3>
+            </button>
+
+            <button className="flex flex-row gap-5 items-center hover:bg-gray-800 hover:cursor-pointer rounded-2xl p-5"
+            onClick={()=> navigate('/game-form')}>
+                <img src="/form_purple_icon.png" alt="Icono de Formulario" className="w-20 bg-black border-white border-2 rounded-3xl"/>
+                <h3 className="font-semibold text-3xl">Add your games manually</h3>
             </button>
         </div>
     )
