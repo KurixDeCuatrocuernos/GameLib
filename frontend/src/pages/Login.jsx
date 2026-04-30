@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import {validateUserInput, validatePassword} from "../utils/validators"
 import { useAuth } from '../contexts/AuthContext'
+import { useNavigate } from "react-router-dom"
 
 const Login = () => {
     const [typeInputPass, setTypeInputPass] = useState("password")
@@ -15,6 +16,8 @@ const Login = () => {
 
     const { login } = useAuth()
     const [isLoading, setIsLoading] = useState(false)
+
+    const navigate = useNavigate() // variable para redirigir
 
 
     // Esta función cambia el tipo del input para ver la contraseña
@@ -97,6 +100,12 @@ const Login = () => {
             </div>
             
         </form>
+
+        <button className="my-5 text-2xl hover:text-blue-700 hover:cursor-pointer" 
+            onClick={() => navigate('/signup')}>
+            You haven't got an account? Sign up here!
+        </button>
+
     </div>)
 }
 
