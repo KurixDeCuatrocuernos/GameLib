@@ -107,12 +107,12 @@ try {
         
         // Procesamos la fecha
         $releaseDate = null;
-        if (isset($gameData['releaseDate'])) {
-            if (is_numeric($gameData['releaseDate'])) {
+        if (isset($gameData['first_release_date'])) {
+            if (is_numeric($gameData['first_release_date'])) {
                 // Es timestamp de Unix
-                $releaseDate = date('Y-m-d', $gameData['releaseDate']);
+                $releaseDate = date('Y-m-d', $gameData['first_release_date']);
             } else {
-                $releaseDate = date('Y-m-d', strtotime($gameData['releaseDate']));
+                $releaseDate = date('Y-m-d', strtotime($gameData['first_release_date']));
             }
         }
 
