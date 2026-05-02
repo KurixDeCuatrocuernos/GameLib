@@ -10,6 +10,7 @@ import Signup from './pages/Signup'
 import Synchronize from './pages/Synchronize'
 import SteamCallback from './pages/SteamCallback'
 import GameForm from './pages/GameForm'
+import MyLibrary from './pages/MyLibrary'
 
 function App() {
 
@@ -64,6 +65,14 @@ function App() {
             <GameForm />
           </PrivateRoute>
         } />
+
+        <Route path='/library' element={
+          <PrivateRoute>
+            <MyLibrary />
+          </PrivateRoute>
+        }
+        
+        />
 
         <Route path="/steam-callback" element={<SteamCallback />} />
         
