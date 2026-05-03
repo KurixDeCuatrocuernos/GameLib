@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react"
 import { useAuth } from '../contexts/AuthContext'
-import Navigator from "./Navigator"
-
 
 const Navbar = () => {
 
@@ -45,8 +43,6 @@ const Navbar = () => {
                     <a className="text-4xl font-bold italic text-green-200" 
                         href="/" >Game Library</a>
                 </div>
-
-                {/* <Navigator /> */}
 
                 {/* SESIÓN DEL USUARIO */}
                 {user ? (  

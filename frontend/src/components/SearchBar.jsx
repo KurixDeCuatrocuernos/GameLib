@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useImperativeHandle, forwardRef } from "react"
 
 // ForwardRef envuelve el componente para poder vaciar la búsqueda desde fuera del componente mediante useRef
-const Navigator = forwardRef(({ onSelectGame, placeholder="Buscar juegos..." }, ref) =>{ 
+const SearchBar = forwardRef(({ onSelectGame, placeholder="Buscar juegos..." }, ref) =>{ 
     const [search, setSearch] = useState("")
     const [games, setGames] = useState([])
     const [loading, setLoading] = useState(false)
@@ -115,4 +115,4 @@ const Navigator = forwardRef(({ onSelectGame, placeholder="Buscar juegos..." }, 
     )
 })
 
-export default Navigator
+export default SearchBar

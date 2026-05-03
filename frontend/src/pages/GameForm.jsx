@@ -1,5 +1,5 @@
 import { useState, useRef } from "react"
-import Navigator from "../components/Navigator"
+import SearchBar from "../components/SearchBar"
 import MessageDisplay from "../components/MessageDisplay"
 
 const GameForm = () => {
@@ -140,7 +140,7 @@ const GameForm = () => {
             <div className="bg-gray-800 p-6 rounded-xl">
                 <h2 className="text-xl font-bold text-green-400 mb-4">Buscar juego</h2>
                 
-                <Navigator onSelectGame={handleSelectGame} ref={navigatorRef} placeholder="Escribe el nombre del juego..." />
+                <SearchBar onSelectGame={handleSelectGame} ref={navigatorRef} placeholder="Escribe el nombre del juego..." />
                 
                 {selectedGame && (
                     <div className="mt-3 p-2 bg-green-800 rounded-lg">
