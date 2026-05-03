@@ -52,9 +52,10 @@ if (!empty($username) && !empty($email) && !empty($password)) {
         ]); // Deberíamos redirigir al formulario y dar feedback
         exit;
     } else {
-        // Creamos el usuario mediante una transacción
-        mysqli_begin_transaction($conexion);
         try {
+            global $conexion; // Inicializamos la variable global para la transacción
+            mysqli_begin_transaction($conexion); // Creamos el usuario mediante una transacción
+            
             $sql = 'INSERT INTO users(name, email, password, role) VALUES (?,?,?,?)';
             $passwordHash = password_hash($password, PASSWORD_BCRYPT);
             $userId = ejecutarQuery($sql,[$username, $email, $passwordHash, 1]);
@@ -69,12 +70,12 @@ if (!empty($username) && !empty($email) && !empty($password)) {
             http_response_code(201); // Created
             echo json_encode(["message" => "Se ha creado al usuario con éxito"]);
         } catch (Exception $e) {
-            mysqli_rollback($conexion);
+            mysqli_rollback($conexion); // Si algo falla cancelamos la transacción
             http_response_code(500); // Internal server error
             echo json_encode(["message" => "Error al crear la cuenta"]); // Deberíamos dar Feedback del error interno
         }
-        mysqli_close($conexion);
-        exit;
+        mysqli_close($conexion); // Cerramos la conexión
+        exit; // Salimos del script 
     }   
 } else {
     http_response_code(400); // Bad Request
