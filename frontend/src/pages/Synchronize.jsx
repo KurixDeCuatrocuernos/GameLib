@@ -61,7 +61,7 @@ const Synchronize = () => {
         }
     }, [searchParams])
 
-    // 🔥 Función para sincronizar juegos (sin vincular cuenta)
+    // Función para sincronizar juegos (sin vincular cuenta)
     async function syncSteamGames() {
         setIsLoading(true)
         setSyncResult(null)
@@ -91,7 +91,7 @@ const Synchronize = () => {
         }
     }
 
-    // 🔥 Función para vincular cuenta y luego sincronizar
+    // Función para vincular cuenta y luego sincronizar
     function linkAndSyncSteam() {
         setSyncSteam(true)
         window.location.href = '/api/functions/apiFunctions/steam/steamLogin.php'
