@@ -59,5 +59,22 @@ function checkUserByUserRole($userRole) {
     return $userRole === $role[0]["id"];
 }
 
+/**
+ * Esta función recoge todos los nombres de usuario menos el del usuario actual
+ */
+function getAllUsersNames(int $userId) {
+    $sql = 'SELECT name FROM users WHERE id != ?';
+    $result = ejecutarQuery($sql,[$userId]);
+    return $result;
+}
+
+/**
+ * Esta función recoge todos los emails de usuario menos el proporcionado
+ */
+function getAllUsersEmails(int $userId) {
+    $sql = 'SELECT email FROM users WHERE id != ?';
+    $result = ejecutarQuery($sql,[$userId]);
+    return $result;
+}
 
 ?>

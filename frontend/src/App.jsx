@@ -11,6 +11,7 @@ import Synchronize from './pages/Synchronize'
 import SteamCallback from './pages/SteamCallback'
 import GameForm from './pages/GameForm'
 import MyLibrary from './pages/MyLibrary'
+import Profile from './pages/Profile'
 
 function App() {
 
@@ -59,21 +60,27 @@ function App() {
             <Synchronize />
           </PrivateRoute> } 
         />
-
+        {/* Insertar juegos manualmente */}
         <Route path='/game-form' element={
           <PrivateRoute>
             <GameForm />
           </PrivateRoute>
         } />
-
+        {/* Biblioteca del usuario */}
         <Route path='/library' element={
           <PrivateRoute>
             <MyLibrary />
           </PrivateRoute>
-        }
-        
-        />
+        } />
+        {/* Página de perfil del usuario */}
+        <Route path='/profile' element={
+          <PrivateRoute>
+            <Profile />
+          </PrivateRoute>
+        } />
 
+        
+        {/* Steam Callback */}
         <Route path="/steam-callback" element={<SteamCallback />} />
         
       </Routes>

@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS users_data (
     theme INT,
     language INT,
     
-    FOREIGN KEY (id) REFERENCES users(id),
+    FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (theme) REFERENCES themes(id),
     FOREIGN KEY (language) REFERENCES languages(id)
 );
