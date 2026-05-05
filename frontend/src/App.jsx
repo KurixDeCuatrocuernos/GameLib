@@ -12,8 +12,11 @@ import SteamCallback from './pages/SteamCallback'
 import GameForm from './pages/GameForm'
 import MyLibrary from './pages/MyLibrary'
 import Profile from './pages/Profile'
+import AdminDashboard from './pages/adminPages/AdminDashboard'
 
 function App() {
+
+  const { user, loading } = useAuth()
 
   // Componente que protege rutas privadas (requieren estar logueado)
   const PrivateRoute = ({children}) => {
@@ -32,8 +35,14 @@ function App() {
       return children
   }
 
-
-
+  // Compoente que protege las rutas de administrador
+  const AdminRoute = ({ children }) => {
+    if (loading) return <div className="text-center py-20">Cargando...</div>
+    if (!user) return <Navigate to="/login" replace />
+    // Verificamos que el usuario tenga rol de administrador (rol = 2)
+    if (user.role !== 'admin') return <Navigate to="/" replace />
+    return children
+  }
 
   return (
     <>
@@ -78,8 +87,14 @@ function App() {
             <Profile />
           </PrivateRoute>
         } />
+        {/* Página de administrador */}
+        <Route path='/admin' element={
+          <AdminRoute>
+            <AdminDashboard />
+          </AdminRoute>
+        } />
 
-        
+
         {/* Steam Callback */}
         <Route path="/steam-callback" element={<SteamCallback />} />
         

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react"
 import { useAuth } from '../contexts/AuthContext'
+import { useNavigate } from "react-router-dom"
 
 const Navbar = () => {
 
     const { user, logout, loading } = useAuth()
+    const navigate = useNavigate()
 
     async function cerrarSesion() {
         const confirmar = confirm("¿Seguro que quieres cerrar la sesión?")
@@ -31,11 +33,11 @@ const Navbar = () => {
         )
     }
 
-    return (<header>
-        <div >
-            <div className="flex flex-row justify-between items-center w-full bg-green-950 p-5">
+    return (<header className="w-full">
+        <div className="w-full">
+            <div className="flex flex-row justify-between items-center bg-green-950 p-5 w-full">
                 {/* TITULO */}
-                <div className="flex flex-row items-center gap-2">
+                <div className="flex flex-row items-center gap-2 w-auto">
                     <a href="/">
                         <img className="w-20 h-20"
                         src="/gamepad-Icon.png" alt="Logo del proyecto" />
@@ -43,6 +45,13 @@ const Navbar = () => {
                     <a className="text-4xl font-bold italic text-green-200" 
                         href="/" >Game Library</a>
                 </div>
+                
+                {/* Botón para Admin */}
+                {user?.role === 'admin' && (
+                    <div className="bg-green-200 rounded-3xl h-auto p-2 hover:cursor-pointer hover:opacity-50" onClick={()=>navigate('/admin')}>
+                        <img src="/ajustes.png" alt="Icono de ajustes" className="h-7" />    
+                    </div>
+                )}
 
                 {/* SESIÓN DEL USUARIO */}
                 {user ? (  
@@ -68,7 +77,7 @@ const Navbar = () => {
             
         </div>
         {/* NAV */}
-        <nav className="flex flex-row gap-4 justify-evenly items-center w-full text-2xl font-bold italic">
+        <nav className="flex flex-row gap-4 justify-evenly items-center w-auto text-xl font-bold italic">
             {!user ? (
                 <>
                     <a className="hover:text-green-950" href="/login">Log In</a>
