@@ -6,7 +6,7 @@ const AdminDashboard = () => {
         <h1 className="text-4xl text-center font-bold my-5">Página de Administrador</h1>
         <h2 className="text-2xl text-center font-semibold italic my-5">Aquí puedes acceder a los diferentes campos de nuestra web</h2>
         {/* Contenedores de las secciones */}
-        <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 my-10">
             <ContentCard 
                 title={"Página de Usuarios"}
                 subtitle={"En esta página puedes ver y gestionar la información de los usuarios"}
@@ -19,12 +19,12 @@ const AdminDashboard = () => {
                 buttonText={"Ir a Juegos"}
                 rute={'/admin/games'}  
             />
-            <ContentCard 
+            {/* <ContentCard 
                 title={"Página de Proveedores"}
                 subtitle={"En esta página puedes ver y gestionar la información de los proveedores de los usuarios"}
                 buttonText={"Ir a Proveedores"}
                 rute={'/admin/providers'}  
-            />
+            /> */}
             <ContentCard 
                 title={"Página de Juegos de Usuarios"}
                 subtitle={"En esta página puedes ver y gestionar la información de los juegos de los usuarios"}

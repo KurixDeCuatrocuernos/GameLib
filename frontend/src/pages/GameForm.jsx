@@ -136,7 +136,7 @@ const GameForm = () => {
         <MessageDisplay message={message} setMessage={setMessage} />
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Columna izquierda: Buscador */}
+            {/* Buscador */}
             <div className="bg-gray-800 p-6 rounded-xl">
                 <h2 className="text-xl font-bold text-green-400 mb-4">Buscar juego</h2>
                 
@@ -183,7 +183,7 @@ const GameForm = () => {
                 </button>
             </div>
             
-            {/* Columna derecha: Lista de juegos */}
+            {/* Lista de juegos */}
             <div className="bg-gray-800 p-6 rounded-xl">
                 <h2 className="text-xl font-bold text-green-400 mb-4">
                     Lista de juegos ({gameList.length})

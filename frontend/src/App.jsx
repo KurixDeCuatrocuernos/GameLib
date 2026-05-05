@@ -13,6 +13,7 @@ import GameForm from './pages/GameForm'
 import MyLibrary from './pages/MyLibrary'
 import Profile from './pages/Profile'
 import AdminDashboard from './pages/adminPages/AdminDashboard'
+import AdminUsers from './pages/adminPages/AdminUsers'
 
 function App() {
 
@@ -93,6 +94,14 @@ function App() {
             <AdminDashboard />
           </AdminRoute>
         } />
+        {/* Página de administrador de usuarios */}
+        <Route path='/admin/users' element={
+          <AdminRoute>
+            <AdminUsers />
+          </AdminRoute>
+        } />
+
+
 
 
         {/* Steam Callback */}
