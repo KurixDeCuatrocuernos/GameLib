@@ -14,6 +14,7 @@ import MyLibrary from './pages/MyLibrary'
 import Profile from './pages/Profile'
 import AdminDashboard from './pages/adminPages/AdminDashboard'
 import AdminUsers from './pages/adminPages/AdminUsers'
+import AdminGames from './pages/adminPages/AdminGames'
 
 function App() {
 
@@ -100,7 +101,12 @@ function App() {
             <AdminUsers />
           </AdminRoute>
         } />
-
+        {/* Página de administrador de juegos */}
+        <Route path='/admin/games' element={
+          <AdminRoute>
+            <AdminGames />
+          </AdminRoute>
+        } />
 
 
 

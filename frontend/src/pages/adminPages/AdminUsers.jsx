@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import MessageDisplay from "../../components/MessageDisplay"
+import ConfirmComponent from "../../components/ConfirmComponent"
 
 const AdminUsers = () => {
 
@@ -8,7 +9,15 @@ const AdminUsers = () => {
     const [isLoading, setIsLoading] = useState(false)
     const [search, setSearch] = useState('')
     const [filter, setFilter] = useState('all')
-    const [sortBy, setSortBy] = useState('nameAsc')
+    const [sortBy, setSortBy] = useState('idAsc')
+    // Constantes para el modal de confirmación
+    const [showConfirmModal, setShowConfirmModal] = useState(false)
+    const [confirmAction, setConfirmAction] = useState(null)
+    const [confirmParams, setConfirmParams] = useState(null)
+    const [confirmType, setConfirmType] = useState('danger')
+    const [confirmTitle, setConfirmTitle] = useState('')
+    const [confirmQuestion, setConfirmQuestion] = useState('')
+    const [confirmExtraInfo, setConfirmExtraInfo] = useState('')
 
     useEffect(() => {
         getUsersData()
@@ -37,114 +46,118 @@ const AdminUsers = () => {
     }
     
     // Función para cambiar el role del usuario
-    const changeUserRole = async (userId, role) => {
-        const cell = confirm(`¿Estás seguro de que quieres convertir a este usuario en ${role === 2 ? 'Usuario' : 'Administrador'}?`) 
-        if (cell) {
+    const changeUserRole = (userId, role) => {
+        const newRole = role === 2 ? 'Usuario' : 'Administrador'
+        setConfirmTitle('Cambiar rol')
+        setConfirmQuestion(`¿Estás seguro de que quieres convertir a este usuario en ${newRole}?`)
+        setConfirmExtraInfo('')
+        setConfirmType('success')
+        setConfirmAction(() => async () => { 
             setIsLoading(true)
-            try{
-                const response = await fetch ('/api/functions/userFunctions/updateUserRoleById.php', {
-                    method: 'POST', 
+            try {
+                const response = await fetch('/api/functions/userFunctions/updateUserRoleById.php', {
+                    method: 'POST',
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        userId,
-                        role
-                    })
+                    body: JSON.stringify({ userId, role })
                 })
                 const data = await response.json()
                 if (response.ok) {
-                    setMessage({ type:'success', text:data.message })
-                    setTimeout(() => setMessage(null), 2000) // Eliminamos el mensaje de confirmación pasados 2 segundos
-                    getUsersData() // Recargamos la tabla
+                    setMessage({ type: 'success', text: data.message })
+                    setTimeout(() => setMessage(null), 2000)
+                    getUsersData()
                 } else {
                     setMessage({ type: 'error', text: data.message })
                 }
             } catch (error) {
-                setMessage({ type:'error', text:'Error al intentar modificar el role del usuario' })
+                setMessage({ type: 'error', text: 'Error al intentar modificar el role del usuario' })
             } finally {
-                setIsLoading(false)
+                setIsLoading(false) // eliminamos la carga
+                setShowConfirmModal(false) // Cerramos el modal
             }
-        } else {
-            return // Si no, salimos de la función
-        }
+        })
+        setShowConfirmModal(true)
     }
 
     // Función para eliminar al usuario
-    const deleteUser = async (userId) => {
-        const cell = confirm('¿Estás seguro de que quieres eliminar a este usuario?\n(Esta acción es irreversible)')
-        if (cell) {
+    const deleteUser = (userId) => {
+        setConfirmTitle('Eliminar usuario')
+        setConfirmQuestion('¿Estás seguro de que quieres eliminar a este usuario?')
+        setConfirmExtraInfo('Esta acción es irreversible. El usuario perderá todos sus datos.')
+        setConfirmType('danger')
+        setConfirmAction(() => async () => {
             setIsLoading(true)
             try {
-                const response = await fetch('/api/functions/userFunctions/deleteUserById.php',{
+                const response = await fetch('/api/functions/userFunctions/deleteUserById.php', {
                     method: 'DELETE',
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        id: userId,
-                    })
+                    body: JSON.stringify({ id: userId })
                 })
                 const data = await response.json()
                 if (response.ok) {
-                    setMessage({ type:'success', text:data.message })
-                    setTimeout(() => setMessage(null), 2000) // Eliminamos el mensaje de confirmación tras 2 segundos
-                    getUsersData() // Recargamos los datos
+                    setMessage({ type: 'success', text: data.message })
+                    setTimeout(() => setMessage(null), 2000)
+                    getUsersData()
                 } else {
-                    setMessage({ type:'error', text:data.message })
+                    setMessage({ type: 'error', text: data.message })
                 }
             } catch (error) {
-                setMessage({ type:'error', text:'Error al intentar eliminar al usuario' })
+                setMessage({ type: 'error', text: 'Error al intentar eliminar al usuario' })
             } finally {
                 setIsLoading(false)
+                setShowConfirmModal(false)
             }
-        } else {
-            return // Si no salimos de la función
-        }
+        })
+        setShowConfirmModal(true)
     }
 
 
 
-    const resetPassword = async (userId, userEmail) => {
-        const cell = confirm('¿Estás seguro de que quieres restablecer la contraseña de este usuario?')
-        
-        if (!cell) { return }
-        setIsLoading(true) // Iniciamos la carga
-        try {
-            // const response = await fetch('/api/functions/userFunctions/endpointEspecífico.php',{
-            //     method: 'POST',
-            //     credentials: 'include',
-            //     headers: { 'Content-Type': 'application/json' },
-            //     body: JSON.stringify({
-            //         id: userId,
-            //     })
-            // })
-            // const data = await response.json()
-            // if (response.ok) {
-            //     setMessage({ type:'success', text:data.message })
-            //     setTimeout(() => setMessage(null), 2000) // Eliminamos el mensaje de confirmación tras 2 segundos
-            //     getUsersData() // Recargamos los datos
-            // } else {
-            //     setMessage({ type:'error', text:data.message })
-            // }
+    const resetPassword = (userId, userEmail) => {
+        setConfirmTitle('Restablecer contraseña')
+        setConfirmQuestion(`¿Estás seguro de que quieres enviar un enlace de restablecimiento a ${userEmail}?`)
+        setConfirmExtraInfo('El usuario recibirá un correo con instrucciones para crear una nueva contraseña.')
+        setConfirmType('warning')
+        setConfirmAction(() => async () => {
+            setIsLoading(true)
+            try {
+                // const response = await fetch('/api/functions/userFunctions/endpointEspecífico.php',{
+                //     method: 'POST',
+                //     credentials: 'include',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify({
+                //         id: userId,
+                //     })
+                // })
+                // const data = await response.json()
+                // if (response.ok) {
+                //     setMessage({ type:'success', text:data.message })
+                //     setTimeout(() => setMessage(null), 2000) // Eliminamos el mensaje de confirmación tras 2 segundos
+                //     getUsersData() // Recargamos los datos
+                // } else {
+                //     setMessage({ type:'error', text:data.message })
+                // }
 
-            // Para Desarrollo simulamos el envío del correo
-            //  No está hecho, pues requiere añadir un campo en la tabla users para que se le oblegue a modificar la contraseña al iniciar sesión
-            
-            await new Promise(resolve => setTimeout(resolve, 2000))  // Espera 2 segundos
-
-            setMessage({ type:'success', text:`Se ha enviado un correo a ${userEmail} para que pueda restablecer su contraseña`  })
-            setTimeout(() => setMessage(null), 2000) // Eliminamos el mensaje de cofirmación tras 2 segundos
-            
-        } catch (error) {
-            setMessage({ type:'error', text:'Error al intentar eliminar al usuario' })
-        } finally {
-            setIsLoading(false) // Finalizamos la carga
-        }
+                // Para Desarrollo simulamos el envío del correo
+                //  No está hecho, pues requiere añadir un campo en la tabla users para que se le oblegue a modificar la contraseña al iniciar sesión
+                setShowConfirmModal(false)
+                await new Promise(resolve => setTimeout(resolve, 2000))
+                setMessage({ type: 'success', text: `✅ Se ha enviado un correo a ${userEmail} para que pueda restablecer su contraseña` })
+                setTimeout(() => setMessage(null), 2000)
+            } catch (error) {
+                setMessage({ type: 'error', text: 'Error al enviar el correo' })
+            } finally {
+                setIsLoading(false)
+            }
+        })
+        setShowConfirmModal(true)
     }
 
     const resetFilters = () => {
         setFilter('all')
         setSearch('')
-        setSortBy('nameAsc')
+        setSortBy('idAsc')
     }
 
     // Constante para filtrar usuarios
@@ -166,12 +179,16 @@ const AdminUsers = () => {
     const sortedUsers = [...filteredUsers].sort((a,b) => {
         if (sortBy === 'nameAsc') {
             return a.name.localeCompare(b.name)
-        } else if (sortBy === 'emailAsc') {
-            return a.email.localeCompare(b.email)
         } else if (sortBy === 'nameDesc') {
             return b.name.localeCompare(a.name)
         } else if (sortBy === 'emailDesc') {
             return b.email.localeCompare(a.email)
+        } else if (sortBy === 'emailAsc') {
+            return a.email.localeCompare(b.email)
+        } else if (sortBy === 'idAsc') {
+            return a.id - b.id
+        } else if (sortBy === 'idDesc') {
+            return b.id - a.id
         }
         return 0
     })
@@ -187,7 +204,21 @@ const AdminUsers = () => {
                     Aquí puedes ver y gestionar los usuarios de nuestra web
                 </h2>
 
+                {/* Mensajes de confirmación o error */}
                 {message && <MessageDisplay message={message} setMessage={setMessage} />}
+
+                {/* Modal de confirmación */}
+                <ConfirmComponent 
+                    show={showConfirmModal}
+                    setShowConfirmModal={setShowConfirmModal}
+                    title={confirmTitle}
+                    question={confirmQuestion}
+                    extraInformation={confirmExtraInfo}
+                    confirmAction="Confirmar"
+                    cancelAction="Cancelar"
+                    type={confirmType}
+                    onConfirm={confirmAction}
+                />
 
                 <div className="overflow-x-auto relative ">
 
@@ -230,9 +261,11 @@ const AdminUsers = () => {
                                 onChange={(e) => setSortBy(e.target.value)}
                                 className="bg-gray-700 text-white rounded px-3 py-1 hover:cursor-pointer hover:bg-gray-600"
                             >
+                                <option value="idAsc">ID (1-100)</option>
+                                <option value="idDesc">ID (100-1)</option>
                                 <option value="nameAsc">Nombre (A-Z)</option>
-                                <option value="emailAsc">Email (A-Z)</option>
                                 <option value="nameDesc">Nombre (Z-A)</option>
+                                <option value="emailAsc">Email (A-Z)</option>
                                 <option value="emailDesc">Email (Z-A)</option>
                             </select>
                         </div>
@@ -252,7 +285,7 @@ const AdminUsers = () => {
                                     </span>
                                 )}
                             </span>
-                            {search !== '' || filter !== 'all' || sortBy !== 'nameAsc' ? (
+                            {search !== '' || filter !== 'all' || sortBy !== 'idAsc' ? (
                                 <button className="m-1 rounded hover:cursor-pointer hover:bg-gray-600"
                                     onClick={() => resetFilters()}>❌</button>
                             ) : ''}
