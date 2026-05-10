@@ -23,9 +23,9 @@ CREATE TABLE IF NOT EXISTS games (
     -- Internal ID
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     -- IGDB API ID
-    igdb_id INT NOT NULL,
+    igdb_id BIGINT NOT NULL,
     -- JSON to creates the Image URL
-    cover_data JSON NOT NULL,
+    cover VARCHAR(255) NOT NULL,
     -- Title
     name VARCHAR(255) NOT NULL,
     release_date DATE NOT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
-    role INT,
+    role INT DEFAULT(1),
     password VARCHAR(250) NOT NULL,
     created_at TIMESTAMP DEFAULT(CURRENT_TIMESTAMP),
 
@@ -45,25 +45,27 @@ CREATE TABLE IF NOT EXISTS users (
 );
 -- It's a link Table, that's why only has Foreign Keys 
 CREATE TABLE IF NOT EXISTS users_data (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT PRIMARY KEY,
     theme INT,
     language INT,
     
-    FOREIGN KEY (id) REFERENCES users(id),
+    FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (theme) REFERENCES themes(id),
     FOREIGN KEY (language) REFERENCES languages(id)
 );
 -- Table for different providers (steam, Epic, GOG...)
-CREATE TABLE IF NOT EXISTS users_provider(
+CREATE TABLE IF NOT EXISTS users_providers(
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     provider VARCHAR(50) NOT NULL,
     -- We don't know their extension, so we use TEXT type 
+    steam_id VARCHAR(100), -- Este es exclusivo de Steam
     access_token TEXT,
     refresh_token TEXT,
     expires_at TIMESTAMP,
 
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_user_provider (user_id, provider)
 );
 -- Table for categories
 CREATE TABLE IF NOT EXISTS tags (
@@ -92,7 +94,20 @@ CREATE TABLE IF NOT EXISTS users_games (
 
     FOREIGN KEY (game_id) REFERENCES games(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_provider_id) REFERENCES users_provider(id) ON DELETE SET NULL
+    FOREIGN KEY (user_provider_id) REFERENCES users_providers(id) ON DELETE SET NULL,
+    UNIQUE KEY unique_users_games (user_id, game_id, user_provider_id)
 );
+
+-- Como no admiten duplicados no se repetirá la inserción aunque lo ejecutemos por segunda vez
+INSERT INTO roles(name) VALUE("user");
+INSERT INTO roles(name) VALUE("admin");
+
+INSERT INTO themes(name) VALUE("light");
+INSERT INTO themes(name) VALUE("dark");
+
+INSERT INTO languages(name) VALUE("english");
+INSERT INTO languages(name) VALUE("spanish");
+
+
 
 
