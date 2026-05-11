@@ -62,7 +62,7 @@ const Login = () => {
         }
     }
 
-    return(<div className="container mx-auto text-center my-10 border-2 bg-green-950 text-green-50 rounded-2xl">
+    return(<div className="container mx-5 w-auto text-center my-10 border-2 bg-green-950 text-green-50 rounded-2xl">
         <h1 className='text-3xl font-bold my-5'>Login</h1>
         <span className="text-red-500">{errorGeneral}</span>
         <form className="mt-5">

@@ -2,7 +2,7 @@ import ContentCard from "../../components/adminComponents/ContentCard";
 
 const AdminDashboard = () => {
 
-    return(<div className="bg-green-950 flex flex-col justify-center items-center my-5">
+    return(<div className="bg-emerald-700 text-emerald-100 flex flex-col justify-center items-center">
         <h1 className="text-4xl text-center font-bold my-5">Página de Administrador</h1>
         <h2 className="text-2xl text-center font-semibold italic my-5">Aquí puedes acceder a los diferentes campos de nuestra web</h2>
         {/* Contenedores de las secciones */}

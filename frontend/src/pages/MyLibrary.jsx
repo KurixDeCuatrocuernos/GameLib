@@ -74,7 +74,7 @@ const MyLibrary = () => {
         return 0
     })
 
-    return (<div className="bg-green-950 min-h-screen p-6">
+    return (<div className="min-h-screen p-6">
             <div className="container mx-auto">
                 <h1 className="text-3xl font-bold text-green-200 mb-6 text-center">
                     Mi Biblioteca de Juegos

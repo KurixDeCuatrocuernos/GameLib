@@ -99,7 +99,7 @@ const Synchronize = () => {
 
     // Pantalla principal: mostrar opciones
     if (!syncGog && !syncSteam) return (
-        <div className="bg-gray-900 border-2 border-green-100 w-auto m-5 rounded-3xl p-10 flex flex-col gap-10 justify-evenly items-center">
+        <div className="bg-gray-900 border-2 border-green-100 w-auto m-5 my-20 rounded-3xl p-10 flex flex-col gap-10 justify-evenly items-center">
             <MessageDisplay message={message} setMessage={setMessage}/> {/* Mensaje de error o confirmación */}
             
             {/* Botón Steam */}

@@ -153,7 +153,7 @@ const Profile = () => {
     }
 
     return (
-        <div className="bg-green-950 min-h-screen p-6">
+        <div className="min-h-screen p-6">
             <div className="container mx-auto max-w-2xl">
                 <h1 className="text-3xl font-bold text-green-200 mb-6 text-center">
                     Mi Perfil

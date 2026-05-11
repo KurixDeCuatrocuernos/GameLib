@@ -11,10 +11,13 @@ const ContentCard = ({ title, subtitle, buttonText, rute }) => {
         <h2 className="text-gray-300 text-xl text-justify mx-10 my-5">
             {subtitle}
         </h2>
-        <button className="bg-green-500 text-gray-100 font-semibold p-2 border-2 border-green-200 rounded-xl hover:cursor-pointer hover:opacity-50"
-            onClick={() => navigate(rute)}>
-            {buttonText}
-        </button>
+        {buttonText && rute ? (
+            <button className="bg-green-500 text-gray-100 font-semibold p-2 border-2 border-green-200 rounded-xl hover:cursor-pointer hover:opacity-50"
+                onClick={() => navigate(rute)}>
+                {buttonText}
+            </button>
+        ) : ''
+        }
     </div>)
 }
 export default ContentCard

@@ -13,7 +13,7 @@ const GogLinkGuide = () => {
             <section className={sectionStyle}>
                 <h1 className={titleStyle}>Paso 1</h1>
                 <h2 className={subtitleStyle}>Instalar GOG Galaxy</h2>
-                <p className={pStyle}>Debes instalar la aplicación de escritorio de GOG Galaxy y crear una cuenta si no tienes ya una</p>
+                <p className={pStyle}>Debes instalar la aplicación de escritorio de GOG Galaxy de <a href="https://www.gog.com/galaxy" className="font-bold italic hover:text-blue-950">la web oficial</a>, y crear una cuenta si no tienes ya una</p>
                 {/* <img className={imgStyle} src="" alt="Imagen de la Web de GOG" /> */}
             </section>
             <section className={sectionStyle}>

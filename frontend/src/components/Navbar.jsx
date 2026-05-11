@@ -33,16 +33,16 @@ const Navbar = () => {
         )
     }
 
-    return (<header className="w-full">
-        <div className="w-full">
-            <div className="flex flex-row justify-between items-center bg-green-950 p-5 w-full">
+    return (<header className="min-w-150">
+        <div className=" border-b-2">
+            <div className="flex flex-row justify-between items-center bg-green-950 p-5">
                 {/* TITULO */}
-                <div className="flex flex-row items-center gap-2 w-auto">
+                <div className="flex flex-row items-center gap-2">
                     <a href="/">
                         <img className="w-20 h-20"
                         src="/gamepad-Icon.png" alt="Logo del proyecto" />
                     </a>
-                    <a className="text-4xl font-bold italic text-green-200" 
+                    <a className="text-2xl font-bold italic text-green-200" 
                         href="/" >Game Library</a>
                 </div>
                 
@@ -63,7 +63,7 @@ const Navbar = () => {
                                 className="bg-green-100 text-black font-bold w-30 py-2 rounded-3xl hover:cursor-pointer hover:bg-green-950 hover:text-green-50">
                                 Cerrar Sesión</button>
                         </div>
-                        <img src="/gamepad-Icon.png" alt="User's Picture" className="w-20 h-20"/>
+                        <a href="/profile"><img src="/gamepad-Icon.png" alt="User's Picture" className="w-20 h-20"/></a>
                     </div>)
                 : (
                     <div className="flex gap-2">
@@ -77,7 +77,7 @@ const Navbar = () => {
             
         </div>
         {/* NAV */}
-        <nav className="flex flex-row gap-4 justify-evenly items-center w-auto text-xl font-bold italic">
+        <nav className="flex flex-row gap-4 justify-evenly items-center w-auto text-xl font-bold italic m-5">
             {!user ? (
                 <>
                     <a className="hover:text-green-950" href="/login">Log In</a>

@@ -194,7 +194,7 @@ const AdminUsers = () => {
     })
 
     return (
-        <div className="bg-green-950 min-h-screen p-6">
+        <div className="bg-emerald-700 text-emerald-100 min-h-screen p-6">
             {/* Contenido de la página */}
             <div className="container mx-auto">
                 <h1 className="text-4xl text-center font-bold text-green-200 my-5">
@@ -234,7 +234,7 @@ const AdminUsers = () => {
                         
                         <form className="flex flex-row justify-center items-center w-full mx-10 my-5">
                             <span className="text-green-200 w-auto">Buscar Usuario: </span>
-                            <input type="search" className="bg-gray-400 text-black font-semibold italic w-auto mx-5 rounded hover:bg-gray-500 px-5"
+                            <input type="search" className="bg-gray-400 text-black font-semibold italic w-auto mx-5 rounded hover:bg-gray-500 px-5 transition-colors"
                                 value={search}
                                 onChange={(e)=> setSearch(e.target.value)}
                                 placeholder="Buscar Usuario..."
@@ -246,7 +246,7 @@ const AdminUsers = () => {
                             <select 
                                 value={filter} 
                                 onChange={(e) => setFilter(e.target.value)}
-                                className="bg-gray-700 text-white rounded px-3 py-1 hover:cursor-pointer hover:bg-gray-600"
+                                className="bg-gray-700 text-white rounded px-3 py-1 hover:cursor-pointer hover:bg-gray-600 transition-colors"
                             >
                                 <option value="all">Todos</option>
                                 <option value="user">Usuario</option>
@@ -259,7 +259,7 @@ const AdminUsers = () => {
                             <select 
                                 value={sortBy} 
                                 onChange={(e) => setSortBy(e.target.value)}
-                                className="bg-gray-700 text-white rounded px-3 py-1 hover:cursor-pointer hover:bg-gray-600"
+                                className="bg-gray-700 text-white rounded px-3 py-1 hover:cursor-pointer hover:bg-gray-600 transition-colors"
                             >
                                 <option value="idAsc">ID (1-100)</option>
                                 <option value="idDesc">ID (100-1)</option>
@@ -292,7 +292,7 @@ const AdminUsers = () => {
                         </div>
                     </div>
 
-                    <table className="w-full bg-gray-800 rounded-2xl border-2 border-green-100">
+                    <table className="w-full bg-gray-800 rounded-2xl border-2 border-green-100 w-auto">
                         <thead className="bg-gray-900">
                             <tr>
                                 <th className="p-3 text-left">ID</th>
@@ -304,23 +304,23 @@ const AdminUsers = () => {
                         </thead>
                         <tbody>
                             {sortedUsers.map((user) => (
-                                <tr key={user.id} className="border-b border-gray-700 hover:bg-gray-700">
+                                <tr key={user.id} className="border-b border-gray-700 hover:bg-gray-700 transition-colors">
                                     <td className="p-3">{user.id}</td>
                                     <td className="p-3">{user.name}</td>
                                     <td className="p-3">{user.email}</td>
                                     <td className="p-3 text-center">
                                         {user.role_name}
-                                        <button className="bg-blue-600 text-white px-3 py-1 rounded text-sm w-fit hover:bg-blue-700 hover:cursor-pointer m-2"
+                                        <button className="bg-blue-600 text-white px-3 py-1 rounded text-sm w-fit hover:bg-blue-800 hover:cursor-pointer m-2 transition-colors"
                                             onClick={() => changeUserRole(user.id, user.role)}>
                                             Convertir en {user.role === 2 ? 'Usuario' : 'Administrador'}
                                         </button>
                                     </td>
                                     <td className="p-3">
-                                        <button className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 hover:cursor-pointer m-2"
+                                        <button className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-800 hover:cursor-pointer m-2 transition-colors"
                                             onClick={() => deleteUser(user.id)}>
                                             Eliminar
                                         </button>
-                                        <button className="bg-yellow-600 text-white px-3 py-1 rounded text-sm hover:bg-yellow-700 hover:cursor-pointer"
+                                        <button className="bg-yellow-600 text-white px-3 py-1 rounded text-sm hover:bg-yellow-800 hover:cursor-pointer transition-colors"
                                             onClick={() => resetPassword(user.id, user.email)}>
                                             Reset Password
                                         </button>

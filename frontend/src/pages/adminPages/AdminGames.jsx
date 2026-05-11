@@ -125,15 +125,15 @@ const AdminGames = () => {
     })
 
     return (
-        <div className="bg-green-950 min-h-screen p-6">
+        <div className="bg-emerald-700 text-emerald-100 min-h-screen p-6">
             {/* Contenido de la página */}
             <div className="container mx-auto">
                 {/* Título */}
-                <h1 className="text-4xl text-center font-bold text-green-200 my-5">
+                <h1 className="text-4xl text-center font-bold my-5">
                     Página de Administrador
                 </h1>
                 {/* Subtítulo */}
-                <h2 className="text-2xl text-center font-semibold italic text-green-300 my-5">
+                <h2 className="text-2xl text-center font-semibold italic my-5">
                     Aquí puedes ver y gestionar los juegos de nuestra web
                 </h2>
                 
@@ -223,7 +223,7 @@ const AdminGames = () => {
                         </thead>
                         <tbody>
                             {sortedGames.map((game) => (
-                                <tr key={game.id} className="border-b border-gray-700 hover:bg-gray-700">
+                                <tr key={game.id} className="border-b border-gray-700 hover:bg-gray-700 transition-colors">
                                     <td className="p-3">{game.id}</td>
                                     <td className="p-3">{game.name}</td>
                                     <td className="p-3">
@@ -238,7 +238,7 @@ const AdminGames = () => {
                                     </td>
                                     <td className="p-3">{game.release_date}</td>
                                     <td className="p-3">
-                                        <button className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 hover:cursor-pointer m-2"
+                                        <button className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 hover:cursor-pointer m-2 transition-colors"
                                             onClick={() => deleteGame(game.id)}>
                                             Eliminar
                                         </button>
