@@ -15,6 +15,8 @@ import Profile from './pages/Profile'
 import AdminDashboard from './pages/adminPages/AdminDashboard'
 import AdminUsers from './pages/adminPages/AdminUsers'
 import AdminGames from './pages/adminPages/AdminGames'
+import Footer from './components/Footer'
+import ErrorPage from './pages/errorPages/ErrorPage'
 
 function App() {
 
@@ -108,12 +110,22 @@ function App() {
           </AdminRoute>
         } />
 
+        {/* Página de error */}
+        <Route path='/error' element={
+          <ErrorPage />
+        } />
+        {/* Redirección para cualquier ruta que no se haya configurado */}
+        <Route path="*" element={
+          <Navigate to="/error?code=404" replace />
+        } />
 
 
         {/* Steam Callback */}
         <Route path="/steam-callback" element={<SteamCallback />} />
         
       </Routes>
+      
+      <Footer />
     </>
   )
 }
