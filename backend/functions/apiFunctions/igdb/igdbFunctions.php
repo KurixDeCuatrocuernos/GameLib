@@ -3,7 +3,7 @@
  * En este documento se han creado las funciones que se usarán en otras funciones
  */
 
-define('IGDB_JSON', __DIR__.'/igdbData.json');
+define('IGDB_JSON', __DIR__.'/igdbData.json'); // Fichero con las credenciales de la API
 
 /**
  * Esta función obtiene una lista de juegos de la API IGDB a partir de su titulo y un límite

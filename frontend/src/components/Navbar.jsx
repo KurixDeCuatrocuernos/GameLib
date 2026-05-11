@@ -89,18 +89,10 @@ const Navbar = () => {
                 <>
                     <a className="hover:text-green-950" href="/library">Mi Biblioteca</a>
                     <p>/</p>
-                    <a className="hover:text-green-950" href="/profile">Mi Perfil</a>
-                    <p>/</p>
                 </>
             )}
             <a className=" hover:text-green-950" 
                 href="/synchronize">Synchronize Libraries</a>
-            <p>/</p>
-            <a className=" hover:text-green-950" 
-                href="">Enlace 4</a>
-            <p>/</p>
-            <a className=" hover:text-green-950" 
-                href="">Enlace 5</a>
         </nav>
 
     </header>)

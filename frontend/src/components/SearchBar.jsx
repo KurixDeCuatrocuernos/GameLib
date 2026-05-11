@@ -46,7 +46,7 @@ const SearchBar = forwardRef(({ onSelectGame, placeholder="Buscar juegos..." }, 
             if (response.ok) {
                 const data = await response.json()
                 
-                // console.log("Respuesta del backend:", data)
+                console.log("Respuesta del backend:", data)
                 // console.log("message es array?", Array.isArray(data['message']))
                 // console.log("Longitud:", data['message']?.length)
 
@@ -55,7 +55,7 @@ const SearchBar = forwardRef(({ onSelectGame, placeholder="Buscar juegos..." }, 
                 setGames(["Error en el response"])
             }
         } catch (error) {
-            console.log("Error en la conexión con el Backend")
+            console.log("Error en la conexión con el Backend: ",error)
         } finally {
             setLoading(false)
         }

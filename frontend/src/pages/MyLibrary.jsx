@@ -123,6 +123,12 @@ const MyLibrary = () => {
                     <div className="text-green-200">
                         Total: {sortedGames.length} juegos
                     </div>
+
+                    <div className="flex flex-col text-green-200 items-center">
+                        <p>¿Quieres añadir un juego?, haz click aquí:</p>
+                        <button className="bg-green-500 text-green-50 italic font-bold rounded-2xl w-fit m-5 py-2 px-3 border-2 border-green-100 hover:opacity-50 hover:cursor-pointer" 
+                            onClick={()=>navigate('/game-form')}>Añadir Juegos</button> 
+                    </div>
                 </div>
                 
                 {/* Lista de juegos */}
